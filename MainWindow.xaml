@@ -1,0 +1,34 @@
+﻿<Window x:Class="WindowSelector.MainWindow"
+        Activated="Window_Activated"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:WindowSelector"
+        Title="MainWindow" Height="350" Width="300"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        Background="Transparent">
+
+    <Window.Resources>
+        <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <ListBox Background="Transparent" BorderThickness="0" x:Name="WindowListBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" SelectionChanged="WindowListBox_SelectionChanged_1">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Image Width="40" Height="40" Margin="5" Source="{Binding Icon}" />
+                        <TextBlock Text="{Binding Name}" FontSize="72" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Text" Value="{Binding Name, Converter={StaticResource StringToUpperConverter}}"/>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>
