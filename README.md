@@ -17,8 +17,12 @@ Task Switcher
 
 Enter 'Task Switcher' by pressing a button combination: L1+R1+DPAD LEFT.
 
-Navigate through a list of open processes/windows using the 'DPAD'.
-Minimize windows by pressing 'Y'.
-Kill window processes by pressing 'X'.
-Confirm or Select a window to restore or bring to focus by pressing 'A'.
-Exit Task Switcher by pressing 'B'.
+◇ Navigate through a list of open processes/windows using the 'DPAD'.
+
+◇ Minimize windows by pressing 'Y'.
+
+◇ Kill window processes by pressing 'X'.
+
+◇ Confirm or Select a window to restore or bring to focus by pressing 'A'.
+
+◇ Exit Task Switcher by pressing 'B'.
