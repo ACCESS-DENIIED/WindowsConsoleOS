@@ -18,6 +18,7 @@ using Point = System.Drawing.Point;
 using System.Windows.Threading;
 using System.Windows.Input;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace WindowSelector
 {
@@ -25,7 +26,68 @@ namespace WindowSelector
     {
         public string Name { get; set; }
         public Process Process { get; set; }
-        public ImageSource Image { get; set; }
+        public IntPtr WindowHandle { get; set; }
+    }
+
+    public class LazyImageLoader : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is IntPtr hwnd && hwnd != IntPtr.Zero)
+            {
+                Bitmap resizedBmp = null; // Ensure resizedBmp is declared outside the try block for broader scope
+                try
+                {
+                    Bitmap bmp = MainWindow.PrintWindow(hwnd); // Capture the window image
+
+                    // Assuming a fixed scale factor for simplicity; adjust as needed
+                    double scaleFactor = 1.5; // Example scale factor, adjust based on your needs or calculation
+
+                    // Calculate the maximum width based on the screen width and scale factor
+                    // Assuming the image occupies half the screen width
+                    int maxWidth = (int)(System.Windows.SystemParameters.PrimaryScreenWidth * scaleFactor / 2);
+                    int maxHeight = (int)(System.Windows.SystemParameters.PrimaryScreenHeight * scaleFactor); // Adjust as needed
+
+                    double ratioX = (double)maxWidth / bmp.Width;
+                    double ratioY = (double)maxHeight / bmp.Height;
+                    double ratio = Math.Min(ratioX, ratioY);
+
+                    int newWidth = (int)(bmp.Width * ratio);
+                    int newHeight = (int)(bmp.Height * ratio);
+
+                    resizedBmp = new Bitmap(bmp, newWidth, newHeight); // Use the resized bitmap
+
+                    using (MemoryStream memory = new MemoryStream())
+                    {
+                        resizedBmp.Save(memory, System.Drawing.Imaging.ImageFormat.Jpeg); // Save as JPEG
+                        memory.Position = 0;
+                        BitmapImage bitmapimage = new BitmapImage();
+                        bitmapimage.BeginInit();
+                        bitmapimage.StreamSource = memory;
+                        bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmapimage.EndInit();
+                        bitmapimage.Freeze(); // Important for use in another thread
+                        return bitmapimage;
+                    }
+                }
+                catch
+                {
+                    // Handle exceptions or return a default image
+                    return DependencyProperty.UnsetValue;
+                }
+                finally
+                {
+                    resizedBmp?.Dispose(); // Ensure resizedBmp is disposed of correctly
+                }
+            }
+
+            return DependencyProperty.UnsetValue; // Return an unset value if conversion is not possible
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     // Convert window titles to uppercase function
@@ -261,22 +323,6 @@ namespace WindowSelector
         // Credit to the Dev of "Handheld Control Panel" for the following functions and structs. Thank you, kind sir!
         //
 
-        System.Windows.Media.Imaging.BitmapImage BitmapToImageSource(Bitmap bitmap)
-        {
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                System.Windows.Media.Imaging.BitmapImage bitmapimage = new System.Windows.Media.Imaging.BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-
-                return bitmapimage;
-            }
-        }
-
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
@@ -482,7 +528,7 @@ namespace WindowSelector
                 {
                     Name = GetFriendlyName(p.ProcessName).ToUpper(),
                     Process = p,
-                    Image = BitmapToImageSource(PrintWindow(p.MainWindowHandle))
+                    WindowHandle = p.MainWindowHandle // Store the handle directly
                 };
                 return item;
             }).ToList();

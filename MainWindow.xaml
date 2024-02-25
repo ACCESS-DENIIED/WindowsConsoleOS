@@ -8,6 +8,10 @@
         WindowStyle="None"
         Background="Transparent">
 
+    <Window.Resources>
+        <local:LazyImageLoader x:Key="LazyImageLoader"/>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <!-- Allocate 1/3 of the space for the ListBox and item names -->
@@ -16,8 +20,16 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ListBox for window selection -->
-        <ListBox Background="Transparent" BorderThickness="0" x:Name="WindowListBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" SelectionChanged="WindowListBox_SelectionChanged" Grid.Column="0">
+        <ListBox VirtualizingStackPanel.IsVirtualizing="True"
+         VirtualizingStackPanel.VirtualizationMode="Recycling"
+         Background="Transparent" 
+         BorderThickness="0" 
+         x:Name="WindowListBox" 
+         HorizontalAlignment="Stretch" 
+         VerticalAlignment="Stretch" 
+         Margin="10" 
+         SelectionChanged="WindowListBox_SelectionChanged" 
+         Grid.Column="0">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Background="Transparent">
@@ -42,7 +54,7 @@
             <Border.Effect>
                 <DropShadowEffect Color="Black" Direction="320" ShadowDepth="5" BlurRadius="10" Opacity="0.5"/>
             </Border.Effect>
-            <Image x:Name="PreviewImage" Source="{Binding SelectedItem.Image, ElementName=WindowListBox}" Stretch="Uniform"/>
+            <Image x:Name="PreviewImage" Source="{Binding SelectedItem.WindowHandle, ElementName=WindowListBox, Converter={StaticResource LazyImageLoader}}" Stretch="Uniform"/>
         </Border>
         <Image Source="Legend.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="600" Margin="10" Grid.ColumnSpan="2" />
     </Grid>
