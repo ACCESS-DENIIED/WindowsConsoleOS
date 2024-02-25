@@ -1,4 +1,4 @@
-(The Name of this project will likely change at some point).
+![GamepadWindowManager](https://github.com/ACCESSDENIIED/WindowsConsoleOS/assets/100420164/d587919f-5935-4168-8532-7fa03fafe2fe)
 
 A work-in-progress application that aims to convert Windows into a Console-like experience.
 
