@@ -40,13 +40,11 @@ namespace WindowSelector
                 {
                     Bitmap bmp = MainWindow.PrintWindow(hwnd); // Capture the window image
 
-                    // Assuming a fixed scale factor for simplicity; adjust as needed
-                    double scaleFactor = 1.5; // Example scale factor, adjust based on your needs or calculation
+                    double scaleFactor = 1.5;
 
                     // Calculate the maximum width based on the screen width and scale factor
-                    // Assuming the image occupies half the screen width
-                    int maxWidth = (int)(System.Windows.SystemParameters.PrimaryScreenWidth * scaleFactor / 2);
-                    int maxHeight = (int)(System.Windows.SystemParameters.PrimaryScreenHeight * scaleFactor); // Adjust as needed
+                    int maxWidth = (int)(System.Windows.SystemParameters.PrimaryScreenWidth * scaleFactor / 2); // Image is always on the right so divide by 2
+                    int maxHeight = (int)(System.Windows.SystemParameters.PrimaryScreenHeight * scaleFactor);
 
                     double ratioX = (double)maxWidth / bmp.Width;
                     double ratioY = (double)maxHeight / bmp.Height;
@@ -545,7 +543,6 @@ namespace WindowSelector
             { "steamwebhelperupdater", "Steam Updater"  },
             { "steamclient", "Steam"  },
             { "devenv", "Visual Studio"  },
-            { "applicationframehost", "Xbox"  },
             { "eadesktop", "EA Launcher"  },
             { "playnite.fullscreenapp", "Playnite Fullscreen"  },
             { "playnite.desktopapp", "Playnite Desktop"  },
@@ -631,10 +628,5 @@ namespace WindowSelector
         const int SW_MINIMIZE = 6;
 
         #endregion
-
-        private void Image_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-
-        }
     }
 }
