@@ -35,6 +35,9 @@ using System.Windows.Controls.Primitives;
 using Windows.UI.Xaml.Controls;
 using Grid = System.Windows.Controls.Grid;
 using ComboBox = System.Windows.Forms.ComboBox;
+using System.Windows.Media.Effects;
+
+// Please don't judge me on this. I'm a noob.
 
 namespace WindowSelector
 {
@@ -122,7 +125,6 @@ namespace WindowSelector
     {
         private readonly Controller controller;
 
-        private List<string> windowTitles;
         private NotifyIcon trayIcon;
         private GamepadButtonFlags previousButtons = GamepadButtonFlags.None;
         private DispatcherTimer gamepadTimer;
@@ -363,16 +365,40 @@ namespace WindowSelector
 
         private void ShowAudioDevicesPopup()
         {
-            PopulateAudioDevicesAsync(); // Populate the ListBox
+            var windowLocation = this.PointToScreen(new System.Windows.Point(0, 0));
+
+            // Position the Popup at the bottom left of the window
+            AudioDevicesPopup.HorizontalOffset = windowLocation.X;
+            AudioDevicesPopup.VerticalOffset = windowLocation.Y + this.ActualHeight - PopupContent.ActualHeight;
+
+            PopulateAudioDevicesAsync();
             AudioDevicesPopup.IsOpen = true;
-            AudioDevicesPopup.Focusable = true;
-            AudioDeviceList.Focus(); // Set focus to the ListBox for keyboard navigation
+
+            var slideInStoryboard = FindResource("SlideIn") as Storyboard;
+            if (slideInStoryboard != null)
+            {
+                Storyboard.SetTarget(slideInStoryboard, PopupContent); // Ensure this is your Popup's content Border/Grid
+                slideInStoryboard.Begin();
+            }
         }
 
         private void HideAudioDevicesPopup()
         {
-            AudioDevicesPopup.IsOpen = false;
-            AudioDevicesPopup.Focusable = false;
+            var slideOutStoryboard = FindResource("SlideOut") as Storyboard;
+            if (slideOutStoryboard != null)
+            {
+                slideOutStoryboard.Completed += (s, e) =>
+                {
+                    AudioDevicesPopup.IsOpen = false;
+                    SlideTransform.Y = 100; // Adjust values further down if needed
+                };
+                Storyboard.SetTarget(slideOutStoryboard, PopupContent);
+                slideOutStoryboard.Begin();
+            }
+            else
+            {
+                AudioDevicesPopup.IsOpen = false;
+            }
         }
 
         private async Task PopulateAudioDevicesAsync()
@@ -467,65 +493,6 @@ namespace WindowSelector
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error setting default audio device or initializing playback: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-
-        private void ShowAudioDeviceList()
-        {
-            if (!isAudioDeviceListVisible)
-            {
-                isAudioDeviceListVisible = true;
-                AudioDeviceList.Visibility = Visibility.Visible;
-                AudioDeviceList.IsEnabled = true; // Enable inputs on the fullscreen menu
-
-                try
-                {
-                    Storyboard storyboard = this.FindResource("ZoomIn") as Storyboard;
-                    if (storyboard != null)
-                    {
-                        Storyboard.SetTarget(storyboard, AudioDeviceList);
-                        storyboard.Begin();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Exception starting animation: {ex.Message}");
-                }
-            }
-            else
-            {
-                isAudioDeviceListVisible = false;
-            }
-        }
-
-        private void HideAudioDeviceList()
-        {
-            if (isAudioDeviceListVisible)
-            {
-                try
-                {
-                    Storyboard storyboard = this.FindResource("ZoomOut") as Storyboard;
-                    if (storyboard != null)
-                    {
-                        Storyboard.SetTarget(storyboard, AudioDeviceList);
-                        storyboard.Completed += (s, e) =>
-                        {
-                            // Once the animation is complete, fully hide the fullscreen menu
-                            AudioDeviceList.Visibility = Visibility.Collapsed;
-                            AudioDeviceList.IsEnabled = false; // Disable inputs on the fullscreen menu
-                            isAudioDeviceListVisible = false; // Update visibility state
-
-                            // Reset the scale and opacity to their original values if needed
-                            AudioDeviceList.RenderTransform = new ScaleTransform(1, 1);
-                            AudioDeviceList.Opacity = 1;
-                        };
-                        storyboard.Begin();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Exception starting animation: {ex.Message}");
                 }
             }
         }
