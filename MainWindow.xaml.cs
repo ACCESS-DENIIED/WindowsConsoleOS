@@ -835,7 +835,8 @@ namespace WindowSelector
                 // Remove "WindowsConsoleOS" and "TextInputHost" processes from the list
                 if (!string.IsNullOrEmpty(process.MainWindowTitle) &&
                     !process.ProcessName.Equals("WindowsConsoleOS", StringComparison.OrdinalIgnoreCase) &&
-                    !process.ProcessName.Equals("TextInputHost", StringComparison.OrdinalIgnoreCase))
+                    !process.ProcessName.Equals("TextInputHost", StringComparison.OrdinalIgnoreCase) &&
+                    !process.ProcessName.Equals("Nvidia Overlay", StringComparison.OrdinalIgnoreCase))
                 {
                     processes.Add(process);
                 }
