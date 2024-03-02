@@ -29,7 +29,7 @@
         </Storyboard>
     </Window.Resources>
 
-    <ui:SimpleStackPanel Margin="12" Spacing="24">
+    <ui:SimpleStackPanel x:Name="MainContent" Margin="12" Spacing="24">
         <Grid>
             <Grid.ColumnDefinitions>
                 <!-- Allocate 1/2 of the space for the ListBox and item names -->
@@ -84,40 +84,39 @@
                 </Border.Effect>
                 <Image x:Name="PreviewImage" Source="{Binding SelectedItem.WindowHandle, ElementName=WindowListBox, Converter={StaticResource LazyImageLoader}}" Stretch="Uniform"/>
             </Border>
-            <Image Source="Legend.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="400" Margin="10" Grid.ColumnSpan="2" />
         </Grid>
 
         <!-- Popup for Audio Devices -->
-        <Popup x:Name="AudioDevicesPopup" Placement="Absolute" AllowsTransparency="True" IsOpen="False">
-            <Border x:Name="PopupContent" Background="transparent" Margin="5" CornerRadius="10" BorderBrush="#FFFFFF" BorderThickness="2">
-                <Border.RenderTransform>
-                    <TranslateTransform x:Name="SlideTransform"/>
-                </Border.RenderTransform>
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
-                </Border.Effect>
-                <StackPanel>
-                    <TextBlock Text="Select Audio Device" Foreground="#FFFFFF" FontSize="16" Margin="10,5" HorizontalAlignment="Center"/>
-                    <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="Foreground" Value="#FFFFFF"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Background" Value="DodgerBlue"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding FullName, Converter={StaticResource StringToUpperConverter}}" Foreground="#FFFFFF"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </StackPanel>
-            </Border>
-        </Popup>
+        <DockPanel>
+            <Popup x:Name="AudioDevicesPopup" Placement="Center" AllowsTransparency="True" IsOpen="False">
+                <Border x:Name="PopupContent" Background="transparent" Margin="5" CornerRadius="10" BorderBrush="#FFFFFF" BorderThickness="2" DockPanel.Dock="Right">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="Select Audio Device" Foreground="#FFFFFF" FontSize="16" Margin="10,5" HorizontalAlignment="Center"/>
+                        <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="DodgerBlue"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding FullName, Converter={StaticResource StringToUpperConverter}}" Foreground="#FFFFFF"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+            </Popup>
+            <Image Source="Legend.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="400" Margin="10" Grid.ColumnSpan="2" />
+        </DockPanel>
     </ui:SimpleStackPanel>
 </Window>

@@ -370,9 +370,11 @@ namespace WindowSelector
             // Position the Popup at the bottom left of the window
             AudioDevicesPopup.HorizontalOffset = windowLocation.X;
             AudioDevicesPopup.VerticalOffset = windowLocation.Y + this.ActualHeight - PopupContent.ActualHeight;
+            ApplyBlurEffectToMainWindowContent(true);
 
-            PopulateAudioDevicesAsync();
+            //PopulateAudioDevicesAsync();
             AudioDevicesPopup.IsOpen = true;
+
 
             var slideInStoryboard = FindResource("SlideIn") as Storyboard;
             if (slideInStoryboard != null)
@@ -390,15 +392,38 @@ namespace WindowSelector
                 slideOutStoryboard.Completed += (s, e) =>
                 {
                     AudioDevicesPopup.IsOpen = false;
-                    SlideTransform.Y = 100; // Adjust values further down if needed
                 };
                 Storyboard.SetTarget(slideOutStoryboard, PopupContent);
                 slideOutStoryboard.Begin();
+                ApplyBlurEffectToMainWindowContent(false);
             }
             else
             {
                 AudioDevicesPopup.IsOpen = false;
             }
+        }
+
+        private void ApplyBlurEffectToMainWindowContent(bool apply)
+        {
+            if (apply)
+            {
+                var blur = new BlurEffect { Radius = 10 };
+                MainContent.Effect = blur;
+            }
+            else
+            {
+                MainContent.Effect = null;
+            }
+        }
+
+        private CustomPopupPlacement[] PopupCustomPlacementMethod(Size popupSize, Size targetSize, Point offset)
+        {
+            var screen = System.Windows.SystemParameters.WorkArea;
+            var rightEdge = screen.Right;
+            var popupX = rightEdge - popupSize.Width;
+            var popupY = (screen.Height / 2) - (popupSize.Height / 2); // Center vertically, adjust as needed
+
+            return new CustomPopupPlacement[] { new CustomPopupPlacement(new System.Windows.Point(popupX, popupY), PopupPrimaryAxis.None) };
         }
 
         private async Task PopulateAudioDevicesAsync()
