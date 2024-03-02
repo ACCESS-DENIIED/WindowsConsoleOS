@@ -84,7 +84,7 @@
                 </Border.Effect>
                 <Image x:Name="PreviewImage" Source="{Binding SelectedItem.WindowHandle, ElementName=WindowListBox, Converter={StaticResource LazyImageLoader}}" Stretch="Uniform"/>
             </Border>
-            <Image Source="Legend.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="600" Margin="10" Grid.ColumnSpan="2" />
+            <Image Source="Legend.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="400" Margin="10" Grid.ColumnSpan="2" />
         </Grid>
 
         <!-- Popup for Audio Devices -->
