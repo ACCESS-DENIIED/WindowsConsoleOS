@@ -22,12 +22,12 @@
         <local:LazyImageLoader x:Key="LazyImageLoader"/>
         <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
         <Storyboard x:Key="OpenAudioDevicePopupAnimation">
-            <DoubleAnimation Duration="0:0:0.2" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"/>
-            <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
+            <DoubleAnimation Duration="0:0:0.3" From="300" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"/>
+            <DoubleAnimation Duration="0:0:0.3" To="1" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
         </Storyboard>
         <Storyboard x:Key="CloseAudioDevicePopupAnimation">
-            <DoubleAnimation Duration="0:0:0.2" To="100" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"/>
-            <DoubleAnimation Duration="0:0:0.2" To="0" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
+            <DoubleAnimation Duration="0:0:0.3" From="0" To="300" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"/>
+            <DoubleAnimation Duration="0:0:0.3" To="0" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
         </Storyboard>
     </Window.Resources>
 
@@ -96,7 +96,7 @@
                         <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
                     </Border.Effect>
                     <Border.RenderTransform>
-                        <TranslateTransform x:Name="popupTranslateTransform" Y="100"/>
+                        <TranslateTransform x:Name="popupTranslateTransform" X="300"/>
                     </Border.RenderTransform>
                     <StackPanel>
                         <TextBlock Text="Select Audio Device" Foreground="#FFFFFF" FontSize="16" Margin="10,5" HorizontalAlignment="Center"/>
