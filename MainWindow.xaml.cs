@@ -426,13 +426,13 @@ namespace WindowSelector
                 var animation = new DoubleAnimation
                 {
                     From = 0,
-                    To = 10, // Target blur radius
-                    Duration = TimeSpan.FromSeconds(0.5), // Animation duration of 0.5 seconds
+                    To = 5, // Target blur radius
+                    Duration = TimeSpan.FromSeconds(0.3), // Animation duration of 0.5 seconds
                     FillBehavior = FillBehavior.Stop // Stops the animation at its final value
                 };
 
                 // When the animation completes, set the blur effect's radius to the final value
-                animation.Completed += (s, e) => blur.Radius = 10;
+                animation.Completed += (s, e) => blur.Radius = 5;
 
                 // Start the animation
                 blur.BeginAnimation(BlurEffect.RadiusProperty, animation);
@@ -445,7 +445,7 @@ namespace WindowSelector
                     var animation = new DoubleAnimation
                     {
                         To = 0, // Animate back to no blur
-                        Duration = TimeSpan.FromSeconds(0.5), // Animation duration of 0.5 seconds
+                        Duration = TimeSpan.FromSeconds(0.3), // Animation duration of 0.5 seconds
                     };
 
                     // When the animation completes, remove the blur effect from MainContent

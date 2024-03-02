@@ -32,66 +32,74 @@
     </Window.Resources>
 
     <DockPanel LastChildFill="True">
-        <!-- Main Content -->
         <ui:SimpleStackPanel x:Name="MainContent" DockPanel.Dock="Top" Margin="12" Spacing="24">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
+                
                 <ListBox VirtualizingStackPanel.IsVirtualizing="True"
-         VirtualizingStackPanel.VirtualizationMode="Recycling"
-         Background="Transparent" 
-         BorderThickness="0" 
-         x:Name="WindowListBox" 
-         HorizontalAlignment="Stretch" 
-         VerticalAlignment="Stretch" 
-         Margin="10" 
-         SelectionChanged="WindowListBox_SelectionChanged" 
-         Grid.Column="0">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Foreground" Value="{StaticResource OnBackgroundColor}"/>
-                        <Setter Property="Padding" Value="8"/>
-                        <Setter Property="Margin" Value="4"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource SurfaceColor}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Background="Transparent" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Image Width="40" Height="40" Source="{Binding Icon}" Grid.Column="0"/>
-                            <TextBlock Text="{Binding Name}" FontSize="72" Foreground="White" Margin="10,0" VerticalAlignment="Center" Grid.Column="1"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                         VirtualizingStackPanel.VirtualizationMode="Recycling"
+                         Background="Transparent" 
+                         BorderThickness="0" 
+                         x:Name="WindowListBox" 
+                         HorizontalAlignment="Stretch" 
+                         VerticalAlignment="Stretch" 
+                         Margin="10" 
+                         SelectionChanged="WindowListBox_SelectionChanged" 
+                         Grid.Column="0">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Bd"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsFocused" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="DodgerBlue"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="DodgerBlue"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Background="Transparent" Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Width="40" Height="40" Source="{Binding Icon}" Grid.Column="0"/>
+                                <TextBlock Text="{Binding Name}" FontSize="72" Foreground="White" Margin="10,0" VerticalAlignment="Center" Grid.Column="1"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-            <!-- Enhanced Preview Image with Rounded Edges and Shadow -->
-            <Border Background="Transparent" Grid.Column="1" Margin="10" CornerRadius="1" VerticalAlignment="Top" HorizontalAlignment="Right" Padding="5">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" Direction="320" ShadowDepth="5" BlurRadius="10" Opacity="0.5"/>
-                </Border.Effect>
-                <Image x:Name="PreviewImage" Source="{Binding SelectedItem.WindowHandle, ElementName=WindowListBox, Converter={StaticResource LazyImageLoader}}" Stretch="Uniform"/>
-            </Border>
-        </Grid>
+                <!-- Enhanced Preview Image with Rounded Edges and Shadow -->
+                <Border Background="Transparent" Grid.Column="1" Margin="10" CornerRadius="1" VerticalAlignment="Top" HorizontalAlignment="Right" Padding="5">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Direction="320" ShadowDepth="5" BlurRadius="10" Opacity="0.5"/>
+                    </Border.Effect>
+                    <Image x:Name="PreviewImage" Source="{Binding SelectedItem.WindowHandle, ElementName=WindowListBox, Converter={StaticResource LazyImageLoader}}" Stretch="Uniform"/>
+                </Border>
+            </Grid>
 
-        <!-- Popup for Audio Devices -->
+            <!-- Popup for Audio Devices -->
             <Popup x:Name="AudioDevicesPopup" Placement="Center" AllowsTransparency="True" IsOpen="False">
-                <Border x:Name="PopupContent" Background="Black" HorizontalAlignment="Right" Margin="20" CornerRadius="10" 
+                <Border x:Name="PopupContent" Background="Black" HorizontalAlignment="Right" Margin="32" CornerRadius="10" 
                         BorderBrush="#FFFFFF" BorderThickness="2">
                     <Border.Effect>
                         <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
@@ -106,18 +114,32 @@
                             <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
                                 <ListBox.ItemContainerStyle>
                                     <Style TargetType="ListBoxItem">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter Property="Foreground" Value="#FFFFFF"/>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter Property="Background" Value="DodgerBlue"/>
-                                            </Trigger>
-                                        </Style.Triggers>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <Border x:Name="Bd"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}">
+                                                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsFocused" Value="True">
+                                                            <Setter TargetName="Bd" Property="Background" Value="DodgerBlue"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter TargetName="Bd" Property="Background" Value="DodgerBlue"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
                                 </ListBox.ItemContainerStyle>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding FullName, Converter={StaticResource StringToUpperConverter}}" Foreground="#FFFFFF"/>
+                                        <TextBlock Text="{Binding FullName}" Foreground="#FFFFFF"/>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
@@ -127,7 +149,7 @@
             </Popup>
         </ui:SimpleStackPanel>
         <Canvas HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="400" Height="100" Margin="10">
-            <Image Source="Legend.png" Width="600" Canvas.Right="0" Canvas.Bottom="120"/>
+            <Image Source="Legend.png" Width="600" Canvas.Right="14" Canvas.Bottom="117"/>
         </Canvas>
     </DockPanel>
 </Window>
