@@ -20,45 +20,13 @@
         <SolidColorBrush x:Key="SurfaceColor" Color="#FF333333"/>
         <SolidColorBrush x:Key="OnSurfaceColor" Color="#DEFFFFFF"/>
         <local:LazyImageLoader x:Key="LazyImageLoader"/>
+        <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
         <Storyboard x:Key="SlideIn">
             <DoubleAnimation Duration="0:0:0.3" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" Storyboard.TargetName="SlideTransform"/>
         </Storyboard>
         <Storyboard x:Key="SlideOut">
             <DoubleAnimation Duration="0:0:0.3" To="100" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" Storyboard.TargetName="SlideTransform"/>
         </Storyboard>
-        <Style x:Key="ModernToggleButton" TargetType="ToggleButton">
-            <Setter Property="Background" Value="#FF0063B1"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
-                            <Border.Effect>
-                                <DropShadowEffect Color="Black" Direction="320" ShadowDepth="5" BlurRadius="10" Opacity="0.5"/>
-                            </Border.Effect>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#FF007ACC"/>
-                                <Setter Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="#FF007ACC" BlurRadius="15" ShadowDepth="0" Opacity="0.7"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <!-- Additional triggers for pressed state etc. here -->
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <ui:SimpleStackPanel Margin="12" Spacing="24">
@@ -121,26 +89,34 @@
 
         <!-- Popup for Audio Devices -->
         <Popup x:Name="AudioDevicesPopup" Placement="Absolute" AllowsTransparency="True" IsOpen="False">
-            <Border x:Name="PopupContent" Background="#2D2D30" Margin="5" CornerRadius="10" BorderBrush="#FF007ACC" BorderThickness="1">
+            <Border x:Name="PopupContent" Background="transparent" Margin="5" CornerRadius="10" BorderBrush="#FFFFFF" BorderThickness="2">
                 <Border.RenderTransform>
                     <TranslateTransform x:Name="SlideTransform"/>
                 </Border.RenderTransform>
                 <Border.Effect>
                     <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
                 </Border.Effect>
-                <ListBox x:Name="AudioDeviceList" DisplayMemberPath="FullName" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="DodgerBlue"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <!-- Modernize the ListBox appearance with a custom style or by adjusting properties here -->
-                </ListBox>
+                <StackPanel>
+                    <TextBlock Text="Select Audio Device" Foreground="#FFFFFF" FontSize="16" Margin="10,5" HorizontalAlignment="Center"/>
+                    <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="DodgerBlue"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FullName, Converter={StaticResource StringToUpperConverter}}" Foreground="#FFFFFF"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
             </Border>
         </Popup>
     </ui:SimpleStackPanel>
