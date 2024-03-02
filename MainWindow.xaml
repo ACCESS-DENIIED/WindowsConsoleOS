@@ -20,6 +20,7 @@
         <SolidColorBrush x:Key="SurfaceColor" Color="#FF333333"/>
         <SolidColorBrush x:Key="OnSurfaceColor" Color="#DEFFFFFF"/>
         <local:LazyImageLoader x:Key="LazyImageLoader"/>
+        <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
         <Storyboard x:Key="SlideIn">
             <DoubleAnimation Duration="0:0:0.3" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" Storyboard.TargetName="SlideTransform"/>
         </Storyboard>
@@ -121,26 +122,34 @@
 
         <!-- Popup for Audio Devices -->
         <Popup x:Name="AudioDevicesPopup" Placement="Absolute" AllowsTransparency="True" IsOpen="False">
-            <Border x:Name="PopupContent" Background="#2D2D30" Margin="5" CornerRadius="10" BorderBrush="#FF007ACC" BorderThickness="1">
+            <Border x:Name="PopupContent" Background="transparent" Margin="5" CornerRadius="10" BorderBrush="#FFFFFF" BorderThickness="1">
                 <Border.RenderTransform>
                     <TranslateTransform x:Name="SlideTransform"/>
                 </Border.RenderTransform>
                 <Border.Effect>
                     <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
                 </Border.Effect>
-                <ListBox x:Name="AudioDeviceList" DisplayMemberPath="FullName" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="DodgerBlue"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <!-- Modernize the ListBox appearance with a custom style or by adjusting properties here -->
-                </ListBox>
+                <StackPanel>
+                    <TextBlock Text="Select Audio Device" Foreground="#FFFFFF" FontSize="16" Margin="10,5" HorizontalAlignment="Center"/>
+                    <ListBox x:Name="AudioDeviceList" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="DodgerBlue"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FullName, Converter={StaticResource StringToUpperConverter}}" Foreground="#FFFFFF"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
             </Border>
         </Popup>
     </ui:SimpleStackPanel>
