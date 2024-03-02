@@ -365,36 +365,48 @@ namespace WindowSelector
 
         private void ShowAudioDevicesPopup()
         {
-            var windowLocation = this.PointToScreen(new System.Windows.Point(0, 0));
+            // Ensure the popup is closed before adjusting its position, to avoid visual glitches.
+            AudioDevicesPopup.IsOpen = false;
 
-            // Position the Popup at the bottom left of the window
-            AudioDevicesPopup.HorizontalOffset = windowLocation.X;
-            AudioDevicesPopup.VerticalOffset = windowLocation.Y + this.ActualHeight - PopupContent.ActualHeight;
+            // Calculate the desired position for the popup.
+            var windowLocation = this.PointToScreen(new System.Windows.Point(0, 0));
+            var windowHeight = this.ActualHeight;
+            var windowWidth = this.ActualWidth;
+
+            // Assuming the PopupContent has a known size (you might need to adjust these values).
+            // If PopupContent's size is dynamic, consider measuring it or using fixed values that work for your layout.
+            var popupHeight = PopupContent.ActualHeight;
+            var popupWidth = PopupContent.ActualWidth;
+
+            // Set the position to the bottom right of the window.
+            AudioDevicesPopup.HorizontalOffset = windowLocation.X + windowWidth - popupWidth - 20; // 20 is an arbitrary margin; adjust as needed.
+            AudioDevicesPopup.VerticalOffset = windowLocation.Y + windowHeight - popupHeight - 20; // Adjust the margin as needed.
+
             ApplyBlurEffectToMainWindowContent(true);
 
-            //PopulateAudioDevicesAsync();
+            // Now open the popup.
             AudioDevicesPopup.IsOpen = true;
 
-
-            var slideInStoryboard = FindResource("SlideIn") as Storyboard;
-            if (slideInStoryboard != null)
+            // Start the animation, if any.
+            var popInStoryboard = FindResource("OpenAudioDevicePopupAnimation") as Storyboard;
+            if (popInStoryboard != null)
             {
-                Storyboard.SetTarget(slideInStoryboard, PopupContent); // Ensure this is your Popup's content Border/Grid
-                slideInStoryboard.Begin();
+                Storyboard.SetTarget(popInStoryboard, PopupContent);
+                popInStoryboard.Begin();
             }
         }
 
         private void HideAudioDevicesPopup()
         {
-            var slideOutStoryboard = FindResource("SlideOut") as Storyboard;
-            if (slideOutStoryboard != null)
+            var popOutStoryboard = FindResource("CloseAudioDevicePopupAnimation") as Storyboard;
+            if (popOutStoryboard != null)
             {
-                slideOutStoryboard.Completed += (s, e) =>
+                popOutStoryboard.Completed += (s, e) =>
                 {
                     AudioDevicesPopup.IsOpen = false;
                 };
-                Storyboard.SetTarget(slideOutStoryboard, PopupContent);
-                slideOutStoryboard.Begin();
+                Storyboard.SetTarget(popOutStoryboard, PopupContent);
+                popOutStoryboard.Begin();
                 ApplyBlurEffectToMainWindowContent(false);
             }
             else

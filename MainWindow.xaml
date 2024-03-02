@@ -21,11 +21,13 @@
         <SolidColorBrush x:Key="OnSurfaceColor" Color="#DEFFFFFF"/>
         <local:LazyImageLoader x:Key="LazyImageLoader"/>
         <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
-        <Storyboard x:Key="SlideIn">
-            <DoubleAnimation Duration="0:0:0.3" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" Storyboard.TargetName="SlideTransform"/>
+        <Storyboard x:Key="OpenAudioDevicePopupAnimation">
+            <DoubleAnimation Duration="0:0:0.2" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"/>
+            <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
         </Storyboard>
-        <Storyboard x:Key="SlideOut">
-            <DoubleAnimation Duration="0:0:0.3" To="100" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" Storyboard.TargetName="SlideTransform"/>
+        <Storyboard x:Key="CloseAudioDevicePopupAnimation">
+            <DoubleAnimation Duration="0:0:0.2" To="100" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"/>
+            <DoubleAnimation Duration="0:0:0.2" To="0" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
         </Storyboard>
     </Window.Resources>
 
@@ -89,10 +91,13 @@
         <!-- Popup for Audio Devices -->
         <DockPanel>
             <Popup x:Name="AudioDevicesPopup" Placement="Center" AllowsTransparency="True" IsOpen="False">
-                <Border x:Name="PopupContent" Background="transparent" Margin="5" CornerRadius="10" BorderBrush="#FFFFFF" BorderThickness="2" DockPanel.Dock="Right">
+                <Border x:Name="PopupContent" Background="Black" DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="20" CornerRadius="10" BorderBrush="#FFFFFF" BorderThickness="2">
                     <Border.Effect>
                         <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
                     </Border.Effect>
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="popupTranslateTransform" Y="100"/>
+                    </Border.RenderTransform>
                     <StackPanel>
                         <TextBlock Text="Select Audio Device" Foreground="#FFFFFF" FontSize="16" Margin="10,5" HorizontalAlignment="Center"/>
                         <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
