@@ -419,12 +419,38 @@ namespace WindowSelector
         {
             if (apply)
             {
-                var blur = new BlurEffect { Radius = 10 };
+                var blur = new BlurEffect();
                 MainContent.Effect = blur;
+
+                // Create and configure the animation
+                var animation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 20, // Target blur radius
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    FillBehavior = FillBehavior.Stop // Stops the animation at its final value
+                };
+
+                animation.Completed += (s, e) => blur.Radius = 20;
+
+                blur.BeginAnimation(BlurEffect.RadiusProperty, animation);
             }
             else
             {
-                MainContent.Effect = null;
+                if (MainContent.Effect is BlurEffect blur)
+                {
+                    var animation = new DoubleAnimation
+                    {
+                        To = 0, // Animate back to no blur
+                        Duration = TimeSpan.FromSeconds(0.3),
+                    };
+
+                    // When the animation completes, remove the blur effect from MainContent
+                    animation.Completed += (s, e) => MainContent.Effect = null;
+
+                    // Start the animation
+                    blur.BeginAnimation(BlurEffect.RadiusProperty, animation);
+                }
             }
         }
 
@@ -790,7 +816,8 @@ namespace WindowSelector
                 // Remove "WindowsConsoleOS" and "TextInputHost" processes from the list
                 if (!string.IsNullOrEmpty(process.MainWindowTitle) &&
                     !process.ProcessName.Equals("WindowsConsoleOS", StringComparison.OrdinalIgnoreCase) &&
-                    !process.ProcessName.Equals("TextInputHost", StringComparison.OrdinalIgnoreCase))
+                    !process.ProcessName.Equals("TextInputHost", StringComparison.OrdinalIgnoreCase) &&
+                    !process.ProcessName.Equals("Nvidia Overlay", StringComparison.OrdinalIgnoreCase))
                 {
                     processes.Add(process);
                 }
