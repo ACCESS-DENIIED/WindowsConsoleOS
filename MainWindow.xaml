@@ -100,7 +100,9 @@
                     </Border.RenderTransform>
                     <StackPanel>
                         <TextBlock Text="Select Audio Device" Foreground="#FFFFFF" FontSize="16" Margin="10,5" HorizontalAlignment="Center"/>
-                        <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
+                        <StackPanel x:Name="ContentPanel" Visibility="Visible">
+                            <TextBlock x:Name="LoadingTextBlock" Text="Populating List..." Foreground="White" HorizontalAlignment="Center" Visibility="Collapsed"/>
+                            <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Background" Value="Transparent"/>
@@ -118,6 +120,7 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Popup>

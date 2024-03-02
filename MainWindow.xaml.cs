@@ -426,23 +426,26 @@ namespace WindowSelector
                 var animation = new DoubleAnimation
                 {
                     From = 0,
-                    To = 20, // Target blur radius
-                    Duration = TimeSpan.FromSeconds(0.3),
+                    To = 10, // Target blur radius
+                    Duration = TimeSpan.FromSeconds(0.5), // Animation duration of 0.5 seconds
                     FillBehavior = FillBehavior.Stop // Stops the animation at its final value
                 };
 
-                animation.Completed += (s, e) => blur.Radius = 20;
+                // When the animation completes, set the blur effect's radius to the final value
+                animation.Completed += (s, e) => blur.Radius = 10;
 
+                // Start the animation
                 blur.BeginAnimation(BlurEffect.RadiusProperty, animation);
             }
             else
             {
                 if (MainContent.Effect is BlurEffect blur)
                 {
+                    // Create and configure the animation to remove the blur
                     var animation = new DoubleAnimation
                     {
                         To = 0, // Animate back to no blur
-                        Duration = TimeSpan.FromSeconds(0.3),
+                        Duration = TimeSpan.FromSeconds(0.5), // Animation duration of 0.5 seconds
                     };
 
                     // When the animation completes, remove the blur effect from MainContent
@@ -466,9 +469,15 @@ namespace WindowSelector
 
         private async Task PopulateAudioDevicesAsync()
         {
+            Dispatcher.Invoke(() => LoadingTextBlock.Visibility = Visibility.Visible);
+
             if (!shouldUpdateDevices && audioDeviceCache != null)
             {
-                AudioDeviceList.ItemsSource = audioDeviceCache;
+                Dispatcher.Invoke(() =>
+                {
+                    AudioDeviceList.ItemsSource = audioDeviceCache;
+                    LoadingTextBlock.Visibility = Visibility.Collapsed;
+                });
                 return;
             }
 
@@ -478,8 +487,12 @@ namespace WindowSelector
                 audioDeviceCache = controller.GetPlaybackDevices(AudioSwitcher.AudioApi.DeviceState.Active).ToList();
             });
 
-            AudioDeviceList.ItemsSource = audioDeviceCache;
-            shouldUpdateDevices = false; // Reset the flag
+            Dispatcher.Invoke(() =>
+            {
+                AudioDeviceList.ItemsSource = audioDeviceCache;
+                shouldUpdateDevices = false; // Reset the flag
+                LoadingTextBlock.Visibility = Visibility.Collapsed;
+            });
         }
 
         private async Task SetDefaultAudioDeviceAsync(Guid deviceId)
@@ -746,14 +759,19 @@ namespace WindowSelector
 
         private void RestoreWindowFromTray()
         {
+
             ShowTrayIcon(false);
             this.Show();
             this.WindowState = WindowState.Maximized;
 
             // Ensure the window is brought to the foreground
             this.Activate();
-            this.Topmost = true; // Temporarily make the window topmost
-            this.Topmost = false; // revert it to normal
+            this.Focus();
+            this.Topmost = true; // Make the window topmost
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                this.Topmost = false; // Revert after a short delay
+            }), DispatcherPriority.ApplicationIdle);
 
             // Set dimensions
             this.Left = 0;
@@ -763,6 +781,7 @@ namespace WindowSelector
 
             // SetForegroundWindow call
             IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            AllowSetForegroundWindow(Process.GetCurrentProcess().Id);
             SetForegroundWindow(hwnd);
         }
 
@@ -816,8 +835,7 @@ namespace WindowSelector
                 // Remove "WindowsConsoleOS" and "TextInputHost" processes from the list
                 if (!string.IsNullOrEmpty(process.MainWindowTitle) &&
                     !process.ProcessName.Equals("WindowsConsoleOS", StringComparison.OrdinalIgnoreCase) &&
-                    !process.ProcessName.Equals("TextInputHost", StringComparison.OrdinalIgnoreCase) &&
-                    !process.ProcessName.Equals("Nvidia Overlay", StringComparison.OrdinalIgnoreCase))
+                    !process.ProcessName.Equals("TextInputHost", StringComparison.OrdinalIgnoreCase))
                 {
                     processes.Add(process);
                 }
