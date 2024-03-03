@@ -482,12 +482,14 @@ namespace WindowSelector
 
         private async Task PopulateAudioDevicesAsync()
         {
+            LoadingTextBlock.Visibility = Visibility.Visible;
+
             if (!shouldUpdateDevices && audioDeviceCache != null)
             {
                 Dispatcher.Invoke(() =>
                 {
                     AudioDeviceList.ItemsSource = audioDeviceCache;
-                    LoadingIcon.Visibility = Visibility.Visible;
+                    LoadingTextBlock.Visibility = Visibility.Visible;
                     AudioDeviceList.Visibility = Visibility.Collapsed;
                 });
                 return;
@@ -503,7 +505,7 @@ namespace WindowSelector
             {
                 AudioDeviceList.ItemsSource = audioDeviceCache;
                 shouldUpdateDevices = false; // Reset the flag
-                LoadingIcon.Visibility = Visibility.Collapsed;
+                LoadingTextBlock.Visibility = Visibility.Collapsed;
                 AudioDeviceList.Visibility = Visibility.Visible;
             });
         }
