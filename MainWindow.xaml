@@ -5,10 +5,13 @@
         xmlns:local="clr-namespace:WindowSelector"
         Title="MainWindow" Height="350" Width="600"
         AllowsTransparency="True"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
-        ui:WindowHelper.UseModernWindowStyle="True"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:ui="http://schemas.modernwpf.com/2019"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         WindowStyle="None"
-        Background="Transparent"
         WindowState="Maximized">
 
     <Window.Resources>
@@ -32,13 +35,13 @@
     </Window.Resources>
 
     <DockPanel LastChildFill="True">
-        <ui:SimpleStackPanel x:Name="MainContent" DockPanel.Dock="Top" Margin="12" Spacing="24">
+        <StackPanel x:Name="MainContent" DockPanel.Dock="Top" Margin="12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <ListBox VirtualizingStackPanel.IsVirtualizing="True"
                          VirtualizingStackPanel.VirtualizationMode="Recycling"
                          Background="Transparent" 
@@ -63,10 +66,10 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsFocused" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#04acf1"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
                                             </Trigger>
                                             <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#04acf1"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -99,8 +102,7 @@
 
             <!-- Popup for Audio Devices -->
             <Popup x:Name="AudioDevicesPopup" Placement="Center" AllowsTransparency="True" IsOpen="False">
-                <Border x:Name="PopupContent" Background="Black" HorizontalAlignment="Right" Margin="32" CornerRadius="10" 
-                        BorderBrush="White" BorderThickness="2">
+                <Border x:Name="PopupContent" Background="{DynamicResource MaterialDesignPaper}" HorizontalAlignment="Right" Margin="32" CornerRadius="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2">
                     <Border.Effect>
                         <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
                     </Border.Effect>
@@ -108,14 +110,13 @@
                         <TranslateTransform x:Name="popupTranslateTransform" X="300"/>
                     </Border.RenderTransform>
                     <StackPanel>
-                        <Border Background="Black" HorizontalAlignment="Stretch">
-                            <TextBlock Text="          AUDIO OUTPUT          " Foreground="White" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
+                        <TextBlock Text="SELECT AUDIO DEVICE" Style="{StaticResource MaterialDesignBody2TextBlock}" FontFamily="./#Inter Black" FontSize="18" Margin="10,5" HorizontalAlignment="Center"/>
                         <StackPanel x:Name="ContentPanel" Visibility="Visible">
+                        <materialDesign:PackIcon x:Name="LoadingIcon" Kind="Loading" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Width="24" Height="24"/>
                             <TextBlock x:Name="LoadingTextBlock" Text="Loading..." Foreground="White" HorizontalAlignment="Center" Visibility="Collapsed"/>
-                            <ListBox x:Name="AudioDeviceList" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
+                            <ListBox x:Name="AudioDeviceList" Style="{StaticResource MaterialDesignListBox}">
                                 <ListBox.ItemContainerStyle>
-                                    <Style TargetType="ListBoxItem">
+                                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ListBoxItem">
@@ -128,10 +129,10 @@
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsFocused" Value="True">
-                                                            <Setter TargetName="Bd" Property="Background" Value="#04acf1"/>
+                                                            <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
                                                         </Trigger>
                                                         <Trigger Property="IsSelected" Value="True">
-                                                            <Setter TargetName="Bd" Property="Background" Value="#04acf1"/>
+                                                            <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
@@ -141,7 +142,14 @@
                                 </ListBox.ItemContainerStyle>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding FullName}" Foreground="#FFFFFF"/>
+                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                            <TextBlock Text="{Binding FullName}" 
+                                                       FontSize="16" 
+                                                       FontWeight="Medium" 
+                                                       Foreground="{DynamicResource MaterialDesignBody}" 
+                                                       VerticalAlignment="Center" 
+                                                       Margin="5,0"/>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
@@ -149,7 +157,7 @@
                     </StackPanel>
                 </Border>
             </Popup>
-        </ui:SimpleStackPanel>
+        </StackPanel>
         <Canvas HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="400" Height="100" Margin="10">
             <Image Source="Legend.png" Width="600" Canvas.Right="14" Canvas.Bottom="117"/>
         </Canvas>

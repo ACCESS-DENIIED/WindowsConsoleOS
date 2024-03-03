@@ -36,6 +36,8 @@ using Windows.UI.Xaml.Controls;
 using Grid = System.Windows.Controls.Grid;
 using ComboBox = System.Windows.Forms.ComboBox;
 using System.Windows.Media.Effects;
+using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
 
 // Please don't judge me on this. I'm a noob.
 
@@ -134,6 +136,7 @@ namespace WindowSelector
         public MainWindow()
         {
             InitializeComponent();
+            InitializeMaterialDesign();
             InitializeGamepadPolling();
             PopulateAudioDevicesAsync();
 
@@ -365,7 +368,7 @@ namespace WindowSelector
 
         private void ShowAudioDevicesPopup()
         {
-            // Ensure the popup is closed before adjusting its position.
+            // Ensure the popup is closed before adjusting its position, to avoid visual glitches.
             AudioDevicesPopup.IsOpen = false;
 
             // Calculate the desired position for the popup.
@@ -373,12 +376,16 @@ namespace WindowSelector
             var windowHeight = this.ActualHeight;
             var windowWidth = this.ActualWidth;
 
+            // Assuming the PopupContent has a known size (you might need to adjust these values).
+            // If PopupContent's size is dynamic, consider measuring it or using fixed values that work for your layout.
             var popupHeight = PopupContent.ActualHeight;
             var popupWidth = PopupContent.ActualWidth;
 
             // Set the position to the bottom right of the window.
-            AudioDevicesPopup.HorizontalOffset = windowLocation.X + windowWidth - popupWidth - 20;
-            AudioDevicesPopup.VerticalOffset = windowLocation.Y + windowHeight - popupHeight - 20;
+            AudioDevicesPopup.HorizontalOffset = windowLocation.X + windowWidth - popupWidth - 20; // 20 is an arbitrary margin; adjust as needed.
+            AudioDevicesPopup.VerticalOffset = windowLocation.Y + windowHeight - popupHeight - 20; // Adjust the margin as needed.
+
+            ApplyBlurEffectToMainWindowContent(true);
 
             // Now open the popup.
             AudioDevicesPopup.IsOpen = true;
@@ -403,11 +410,64 @@ namespace WindowSelector
                 };
                 Storyboard.SetTarget(popOutStoryboard, PopupContent);
                 popOutStoryboard.Begin();
+                ApplyBlurEffectToMainWindowContent(false);
             }
             else
             {
                 AudioDevicesPopup.IsOpen = false;
             }
+        }
+
+        private void ApplyBlurEffectToMainWindowContent(bool apply)
+        {
+            if (apply)
+            {
+                var blur = new BlurEffect();
+                MainContent.Effect = blur;
+
+                // Create and configure the animation
+                var animation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 5, // Target blur radius
+                    Duration = TimeSpan.FromSeconds(0.3), // Animation duration of 0.5 seconds
+                    FillBehavior = FillBehavior.Stop // Stops the animation at its final value
+                };
+
+                // When the animation completes, set the blur effect's radius to the final value
+                animation.Completed += (s, e) => blur.Radius = 5;
+
+                // Start the animation
+                blur.BeginAnimation(BlurEffect.RadiusProperty, animation);
+            }
+            else
+            {
+                if (MainContent.Effect is BlurEffect blur)
+                {
+                    // Create and configure the animation to remove the blur
+                    var animation = new DoubleAnimation
+                    {
+                        To = 0, // Animate back to no blur
+                        Duration = TimeSpan.FromSeconds(0.3), // Animation duration of 0.5 seconds
+                    };
+
+                    // When the animation completes, remove the blur effect from MainContent
+                    animation.Completed += (s, e) => MainContent.Effect = null;
+
+                    // Start the animation
+                    blur.BeginAnimation(BlurEffect.RadiusProperty, animation);
+                }
+            }
+        }
+
+        private void InitializeMaterialDesign()
+        {
+            // Create dummy objects to force the MaterialDesign assemblies to be loaded
+            // from this assembly, which causes the MaterialDesign assemblies to be searched
+            // relative to this assembly's path. Otherwise, the MaterialDesign assemblies
+            // are searched relative to Eclipse's path, so they're not found.
+            var card = new Card();
+            var hue = new Hue("Dummy", Colors.Black, Colors.White);
         }
 
         private CustomPopupPlacement[] PopupCustomPlacementMethod(Size popupSize, Size targetSize, Point offset)
@@ -422,14 +482,13 @@ namespace WindowSelector
 
         private async Task PopulateAudioDevicesAsync()
         {
-            Dispatcher.Invoke(() => LoadingTextBlock.Visibility = Visibility.Visible);
-
             if (!shouldUpdateDevices && audioDeviceCache != null)
             {
                 Dispatcher.Invoke(() =>
                 {
                     AudioDeviceList.ItemsSource = audioDeviceCache;
-                    LoadingTextBlock.Visibility = Visibility.Collapsed;
+                    LoadingIcon.Visibility = Visibility.Visible;
+                    AudioDeviceList.Visibility = Visibility.Collapsed;
                 });
                 return;
             }
@@ -444,7 +503,8 @@ namespace WindowSelector
             {
                 AudioDeviceList.ItemsSource = audioDeviceCache;
                 shouldUpdateDevices = false; // Reset the flag
-                LoadingTextBlock.Visibility = Visibility.Collapsed;
+                LoadingIcon.Visibility = Visibility.Collapsed;
+                AudioDeviceList.Visibility = Visibility.Visible;
             });
         }
 
