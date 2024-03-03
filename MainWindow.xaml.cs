@@ -388,7 +388,7 @@ namespace WindowSelector
             ApplyBlurEffectToMainWindowContent(true);
 
             // Now open the popup.
-            AudioDevicesPopup.IsOpen = true;
+            AudioDevicesPopup.IsOpen = true;    
 
             // Start the animation, if any.
             var popInStoryboard = FindResource("OpenAudioDevicePopupAnimation") as Storyboard;

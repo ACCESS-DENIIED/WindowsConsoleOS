@@ -102,30 +102,44 @@
 
             <!-- Popup for Audio Devices -->
             <Popup x:Name="AudioDevicesPopup" Placement="Center" AllowsTransparency="True" IsOpen="False">
-                <Border x:Name="PopupContent" Background="{DynamicResource MaterialDesignPaper}" HorizontalAlignment="Right" Margin="32" CornerRadius="10" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="2">
+                <Border x:Name="PopupContent" HorizontalAlignment="Center" Margin="32" CornerRadius="10" BorderThickness="1" BorderBrush="{DynamicResource PrimaryColor}">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#FF505050" Offset="0.0" />
+                            <GradientStop Color="#FF303030" Offset="0.1" />
+                            <GradientStop Color="#FF202020" Offset="0.9" />
+                            <GradientStop Color="#FF101010" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Background>
                     <Border.Effect>
-                        <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="2" Opacity="0.5"/>
+                        <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="5" Opacity="0.7"/>
                     </Border.Effect>
                     <Border.RenderTransform>
                         <TranslateTransform x:Name="popupTranslateTransform" X="300"/>
                     </Border.RenderTransform>
                     <StackPanel>
-                        <TextBlock Text="SELECT AUDIO DEVICE" Style="{StaticResource MaterialDesignBody2TextBlock}" FontFamily="./#Inter Black" FontSize="18" Margin="10,5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="SELECT AUDIO DEVICE" 
+                                               FontFamily="./#Inter Black" 
+                                               FontSize="24" 
+                                               FontWeight="Bold" 
+                                               Foreground="{DynamicResource PrimaryColor}" 
+                                               Margin="20,10,20,20" 
+                                               HorizontalAlignment="Center"/>
                         <StackPanel x:Name="ContentPanel" Visibility="Visible">
-                        <materialDesign:PackIcon x:Name="LoadingIcon" Kind="Loading" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Width="24" Height="24"/>
+                            <materialDesign:PackIcon x:Name="LoadingIcon" Kind="Loading" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Width="24" Height="24"/>
                             <TextBlock x:Name="LoadingTextBlock" Text="Loading..." Foreground="White" HorizontalAlignment="Center" Visibility="Collapsed"/>
-                            <ListBox x:Name="AudioDeviceList" Style="{StaticResource MaterialDesignListBox}">
+                            <ListBox x:Name="AudioDeviceList" HorizontalContentAlignment="Stretch" Style="{StaticResource MaterialDesignListBox}">
                                 <ListBox.ItemContainerStyle>
                                     <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ListBoxItem">
                                                     <Border x:Name="Bd"
-                                                            Background="{TemplateBinding Background}"
-                                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                                            BorderThickness="{TemplateBinding BorderThickness}">
+                                                                        Background="{TemplateBinding Background}"
+                                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                                        BorderThickness="{TemplateBinding BorderThickness}">
                                                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsFocused" Value="True">
@@ -142,14 +156,23 @@
                                 </ListBox.ItemContainerStyle>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" Margin="5">
-                                            <TextBlock Text="{Binding FullName}" 
-                                                       FontSize="16" 
-                                                       FontWeight="Medium" 
-                                                       Foreground="{DynamicResource MaterialDesignBody}" 
-                                                       VerticalAlignment="Center" 
-                                                       Margin="5,0"/>
-                                        </StackPanel>
+                                        <Border Background="{DynamicResource SurfaceColor}" 
+                                                            CornerRadius="4" 
+                                                            Padding="10" 
+                                                            Margin="5">
+                                            <StackPanel Orientation="Horizontal" Margin="5">
+                                                <materialDesign:PackIcon Kind="Speaker" 
+                                                             VerticalAlignment="Center" 
+                                                             Margin="5,0" 
+                                                             Foreground="{DynamicResource OnSurfaceColor}"/>
+                                                <TextBlock Text="{Binding FullName}" 
+                                                                       FontSize="16" 
+                                                                       FontWeight="Medium" 
+                                                                       Foreground="{DynamicResource OnSurfaceColor}" 
+                                                                       VerticalAlignment="Center" 
+                                                                       Margin="10,0"/>
+                                            </StackPanel>
+                                        </Border>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
