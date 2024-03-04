@@ -273,10 +273,15 @@ namespace WindowSelector
                     {
                         listBox.SelectedIndex++;
                     }
-                    else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.A) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.A))
+                    if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.A) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.A))
                     {
-                        ChangeAudioDeviceToSelected(null, null);
-                        HideAudioDevicesPopup();
+                        var selectedDevice = listBox.SelectedItem as AudioDevice;
+
+                        if (selectedDevice != null)
+                        {
+                            ChangeAudioDeviceToSelected(selectedDevice);
+                            HideAudioDevicesPopup();
+                        }
                     }
                     else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
                     {
@@ -543,18 +548,18 @@ namespace WindowSelector
             return devices;
         }
 
-        private async void ChangeAudioDeviceToSelected(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private async void ChangeAudioDeviceToSelected(AudioDevice selectedDevice)
         {
-            if (AudioOutputDeviceList.SelectedItem is CoreAudioDevice selectedDevice)
+            if (selectedDevice != null)
             {
                 try
                 {
-                    // Call SetDefaultAudioDeviceAsync with the selected device's Id
+                    // Assuming SetDefaultAudioDeviceAsync is a method that changes the audio device based on the device ID
                     await SetDefaultAudioDeviceAsync(selectedDevice.Id);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error setting default audio device or initializing playback: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Error setting default audio device: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
