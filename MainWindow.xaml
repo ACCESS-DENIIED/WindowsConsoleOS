@@ -169,7 +169,7 @@
                                                FontFamily="./#Inter Black" 
                                                FontSize="36" 
                                                HorizontalAlignment="Center" 
-                                               Margin="15" 
+                                               Margin="0,25,0,25" 
                                                Visibility="Collapsed"/>
                                 <Border Background="Transparent" CornerRadius="5" Margin="25">
                                     <StackPanel>
@@ -227,7 +227,9 @@
                                                                 <StackPanel Orientation="Horizontal">
                                                                     <materialDesign:PackIcon Kind="Speaker" 
                                                                                              VerticalAlignment="Center" 
-                                                                                             Margin="0,0,0,0" 
+                                                                                             Margin="10,0,10,0"
+                                                                                             Width="24"
+                                                                                             Height="24"
                                                                                              Foreground="White"/>
                                                                     <TextBlock Text="{Binding Name, Converter={StaticResource StringToUpperConverter}}" 
                                                                                FontSize="24"
@@ -291,9 +293,11 @@
                                                         <DataTemplate>
                                                             <Button Style="{StaticResource MaterialDesignFlatButton}" Padding="0">
                                                                 <StackPanel Orientation="Horizontal">
-                                                                    <materialDesign:PackIcon Kind="Microphone"
+                                                                    <materialDesign:PackIcon Kind="Microphone" 
                                                                                              VerticalAlignment="Center" 
-                                                                                             Margin="10,0,0,0" 
+                                                                                             Margin="10,0,10,0"
+                                                                                             Width="24"
+                                                                                             Height="24"
                                                                                              Foreground="White"/>
                                                                     <TextBlock Text="{Binding Name, Converter={StaticResource StringToUpperConverter}}" 
                                                                                FontSize="24"
