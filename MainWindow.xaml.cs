@@ -251,14 +251,14 @@ namespace WindowSelector
 
             if (AudioDevicesPopup.IsOpen)
             {
-                // Switch between input and output using DPad left and right
-                if (dpadRightPressed && AudioDeviceTabs.SelectedIndex < AudioDeviceTabs.Items.Count - 1)
+                // Directly select output or input tab using DPad left and right
+                if (dpadRightPressed)
                 {
-                    AudioDeviceTabs.SelectedIndex++;
+                    AudioDeviceTabs.SelectedIndex = 1; // Input tab selected
                 }
-                else if (dpadLeftPressed && AudioDeviceTabs.SelectedIndex > 0)
+                else if (dpadLeftPressed)
                 {
-                    AudioDeviceTabs.SelectedIndex--;
+                    AudioDeviceTabs.SelectedIndex = 0; // Output tab selected
                 }
                 else
                 {

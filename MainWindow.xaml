@@ -142,7 +142,7 @@
                             Margin="25" 
                             CornerRadius="1">
                         <StackPanel>
-                            <TextBlock Text="                              AUDIO OUTPUT                              " 
+                            <TextBlock Text="                              SELECT AUDIO DEVICE                             "
                                        FontFamily="./#Inter Black" 
                                        FontSize="24" 
                                        FontWeight="Bold" 
@@ -205,7 +205,7 @@
                                                                              VerticalAlignment="Center" 
                                                                              Margin="5,0" 
                                                                              Foreground="White"/>
-                                                                    <TextBlock Text="{Binding Name}" 
+                                                                    <TextBlock Text="{Binding Name, Converter={StaticResource StringToUpperConverter}}" 
                                                                              FontSize="16" 
                                                                              FontWeight="Medium" 
                                                                              Foreground="White" 
@@ -261,7 +261,7 @@
                                                                                              VerticalAlignment="Center" 
                                                                                              Margin="5,0" 
                                                                                              Foreground="White"/>
-                                                                    <TextBlock Text="{Binding Name}" 
+                                                                    <TextBlock Text="{Binding Name, Converter={StaticResource StringToUpperConverter}}" 
                                                                                              FontSize="16" 
                                                                                              FontWeight="Medium" 
                                                                                              Foreground="White" 
