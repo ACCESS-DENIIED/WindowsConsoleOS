@@ -220,7 +220,7 @@ namespace WindowSelector
             if (!trayIcon.Visible)
             {
                 trayIcon.Visible = true;
-                //this.Hide(); // !debug
+                this.Hide(); // !debug
             }
         }
 
