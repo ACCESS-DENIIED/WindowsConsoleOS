@@ -1,5 +1,7 @@
 ![GamepadWindowManager](https://github.com/ACCESSDENIIED/WindowsConsoleOS/assets/100420164/d587919f-5935-4168-8532-7fa03fafe2fe)
 
+![MainWindow_AudioDevicePopout](https://github.com/ACCESSDENIIED/WindowsConsoleOS/assets/100420164/c11fb510-1671-408a-a295-18ad05499c74)
+
 A work-in-progress application that aims to allow easier navigation when using Windows with a Gamepad/Controller.
 
 Current Features:
