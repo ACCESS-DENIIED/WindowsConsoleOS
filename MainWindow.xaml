@@ -172,7 +172,8 @@
                                                Foreground="White" 
                                                FontFamily="./#Inter Black" 
                                                FontSize="36" 
-                                               HorizontalAlignment="Center" 
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
                                                Margin="0,25,0,25" 
                                                Visibility="Collapsed"/>
                                 <Border Background="Transparent" CornerRadius="5" Margin="25">
@@ -236,7 +237,7 @@
                                                                                              Height="24"
                                                                                              Foreground="White"/>
                                                                     <TextBlock Text="{Binding Name, Converter={StaticResource CompositeDeviceNameConverter}}" 
-                                                                               FontSize="36"
+                                                                               FontSize="24"
                                                                                FontWeight="Medium" 
                                                                                Foreground="White" 
                                                                                VerticalAlignment="Center"/>
