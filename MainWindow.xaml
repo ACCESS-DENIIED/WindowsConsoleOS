@@ -76,7 +76,8 @@
                                         <Border x:Name="Bd"
                                                         Background="{TemplateBinding Background}"
                                                         BorderBrush="{TemplateBinding BorderBrush}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="5">
                                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                         </Border>
@@ -150,7 +151,9 @@
                             HorizontalAlignment="Center" 
                             Background="#DD000000" 
                             Margin="25" 
-                            CornerRadius="20"
+                            BorderBrush="#1A1A1A" 
+                            BorderThickness="2" 
+                            CornerRadius="5"
                             RenderTransformOrigin="1,0.5">
                         <Border.RenderTransform>
                             <TranslateTransform X="0"/>
@@ -172,7 +175,7 @@
                                                HorizontalAlignment="Center" 
                                                Margin="30" 
                                                Visibility="Collapsed"/>
-                                <Border Background="#DD000000" CornerRadius="20" Margin="25">
+                                <Border Background="#DD000000" CornerRadius="5" Margin="25">
                                     <StackPanel>
                                         <TabControl x:Name="AudioDeviceTabs">
                                             <TabItem Header="OUTPUT" Style="{StaticResource TabItemHeaderStyle}">
@@ -194,7 +197,7 @@
                                                                                 Background="{TemplateBinding Background}"
                                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                                                CornerRadius="20">
+                                                                                CornerRadius="2">
                                                                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                                                         </Border>
@@ -250,7 +253,7 @@
                                                                                 Background="{TemplateBinding Background}"
                                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                                                CornerRadius="20">
+                                                                                CornerRadius="2">
                                                                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                                                         </Border>
