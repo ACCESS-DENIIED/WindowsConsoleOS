@@ -3,7 +3,7 @@
                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:local="clr-namespace:WindowSelector"
-                Title="MainWindow" Height="350" Width="600"
+                Title="MainWindow" Height="720" Width="1280"
                 AllowsTransparency="True"
                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:ui="http://schemas.modernwpf.com/2019"
                 TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -50,7 +50,7 @@
         </Storyboard>
     </Window.Resources>
 
-    <DockPanel LastChildFill="True">
+    <DockPanel x:Name="RootPanel" LastChildFill="True">
         <StackPanel x:Name="MainContent" DockPanel.Dock="Top" Margin="12">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -119,7 +119,7 @@
                 <!-- Enhanced Preview Image with Rounded Edges and Shadow -->
                 <Border Background="Transparent" 
                                 Grid.Column="1" Margin="10" 
-                                CornerRadius="1" 
+                                CornerRadius="20" 
                                 VerticalAlignment="Top" 
                                 HorizontalAlignment="Right" 
                                 Padding="5">
@@ -143,14 +143,14 @@
                        Placement="Center" 
                        AllowsTransparency="True" 
                        IsOpen="False">
-                <Grid x:Name="Overlay" Background="Black" Opacity="0" Visibility="Collapsed">
-                    <Border Margin="25" CornerRadius="1">
+                <Grid>
+                    <Border Margin="25" CornerRadius="20">
                     </Border>
                     <Border x:Name="PopupContent" 
                             HorizontalAlignment="Center" 
                             Background="#DD000000" 
                             Margin="25" 
-                            CornerRadius="1"
+                            CornerRadius="20"
                             RenderTransformOrigin="1,0.5">
                         <Border.RenderTransform>
                             <TranslateTransform X="0"/>
@@ -160,7 +160,7 @@
                                        FontFamily="./#Inter Black" 
                                        FontSize="24" 
                                        FontWeight="Bold" 
-                                       Foreground="White" 
+                                       Foreground="Purple"
                                        Margin="20,10,20,0" 
                                        HorizontalAlignment="Center"/>
                             <StackPanel x:Name="ContentPanel" Visibility="Visible">
@@ -172,7 +172,7 @@
                                                HorizontalAlignment="Center" 
                                                Margin="30" 
                                                Visibility="Collapsed"/>
-                                <Border Background="#DD000000" CornerRadius="1" Margin="25">
+                                <Border Background="#DD000000" CornerRadius="20" Margin="25">
                                     <StackPanel>
                                         <TabControl x:Name="AudioDeviceTabs">
                                             <TabItem Header="OUTPUT" Style="{StaticResource TabItemHeaderStyle}">
@@ -194,7 +194,7 @@
                                                                                 Background="{TemplateBinding Background}"
                                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                                                CornerRadius="1">
+                                                                                CornerRadius="20">
                                                                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                                                         </Border>
@@ -250,7 +250,7 @@
                                                                                 Background="{TemplateBinding Background}"
                                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                                                CornerRadius="1">
+                                                                                CornerRadius="20">
                                                                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                                                         </Border>
