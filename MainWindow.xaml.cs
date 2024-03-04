@@ -147,7 +147,7 @@ namespace WindowSelector
 
             // Refresh Window Titles regularly
             refreshTimer = new DispatcherTimer();
-            refreshTimer.Interval = TimeSpan.FromSeconds(2); // Adjust as needed
+            refreshTimer.Interval = TimeSpan.FromSeconds(2);
             refreshTimer.Tick += (sender, e) => RefreshWindowTitlesIfNeeded();
             refreshTimer.Start();
 
@@ -251,6 +251,12 @@ namespace WindowSelector
 
             if (AudioDevicesPopup.IsOpen)
             {
+                // Prevent double dpad input when activating the popup
+                if ((DateTime.Now - lastMenuOpenTime).TotalMilliseconds < 150)
+                {
+                    // Not enough time has passed, ignore the input
+                    return;
+                }
                 // Directly select output or input tab using DPad left and right
                 if (dpadRightPressed)
                 {
@@ -368,6 +374,8 @@ namespace WindowSelector
                 {
                     // show list of audio devices
                     ShowAudioDevicesPopup();
+
+                    lastMenuOpenTime = DateTime.Now;
                 }
                 else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousButtons.HasFlag(GamepadButtonFlags.B))
                 {
@@ -388,6 +396,8 @@ namespace WindowSelector
             }
             previousGamepadState = gamepadState;
         }
+
+        private DateTime lastMenuOpenTime = DateTime.MinValue;
 
         private void ShowAudioDevicesPopup()
         {
@@ -451,7 +461,7 @@ namespace WindowSelector
             var screen = System.Windows.SystemParameters.WorkArea;
             var rightEdge = screen.Right;
             var popupX = rightEdge - popupSize.Width;
-            var popupY = (screen.Height / 2) - (popupSize.Height / 2); // Center vertically, adjust as needed
+            var popupY = (screen.Height / 2) - (popupSize.Height / 2); // Center vertically
 
             return new CustomPopupPlacement[] { new CustomPopupPlacement(new System.Windows.Point(popupX, popupY), PopupPrimaryAxis.None) };
         }
