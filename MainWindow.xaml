@@ -143,7 +143,7 @@
                        Placement="Center" 
                        AllowsTransparency="True" 
                        IsOpen="False">
-                <Grid>
+                <Grid x:Name="Overlay" Background="Black" Opacity="0" Visibility="Collapsed">
                     <Border Margin="25" CornerRadius="1">
                     </Border>
                     <Border x:Name="PopupContent" 

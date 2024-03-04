@@ -417,7 +417,12 @@ namespace WindowSelector
             AudioDevicesPopup.VerticalOffset = windowLocation.Y + windowHeight - popupHeight - 20;
 
             // Now open the popup.
-            AudioDevicesPopup.IsOpen = true;    
+            AudioDevicesPopup.IsOpen = true;
+
+            // Show the overlay
+            Overlay.Visibility = Visibility.Visible;
+            var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(0.3)));
+            Overlay.BeginAnimation(UIElement.OpacityProperty, fadeIn);
 
             // Start the animation, if any.
             var popInStoryboard = FindResource("OpenAudioDevicePopupAnimation") as Storyboard;
@@ -430,7 +435,17 @@ namespace WindowSelector
 
         private void HideAudioDevicesPopup()
         {
+
+            // Hide the overlay
+            var fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromSeconds(0.3)));
+
+            // Correctly attaching the Completed event handler
+            fadeOut.Completed += (s, e) => Overlay.Visibility = Visibility.Collapsed;
+
+            Overlay.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+
             var popOutStoryboard = FindResource("CloseAudioDevicePopupAnimation") as Storyboard;
+
             if (popOutStoryboard != null)
             {
                 popOutStoryboard.Completed += (s, e) =>
