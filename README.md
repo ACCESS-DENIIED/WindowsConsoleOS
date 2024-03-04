@@ -1,28 +1,29 @@
 ![GamepadWindowManager](https://github.com/ACCESSDENIIED/WindowsConsoleOS/assets/100420164/d587919f-5935-4168-8532-7fa03fafe2fe)
 
-A work-in-progress application that aims to convert Windows into a Console-like experience.
+A work-in-progress application that aims to allow easier navigation when using Windows with a Gamepad/Controller.
 
-As of right now, this application is quite basic. I've only added the ability to navigate Windows' tabs/windows similar to how Alt-Tab or Windows-Tab works.
-This program requires an Xinput device (Xbox controller, Xinput via DS4Windows, etc).
+Current Features:
 
-Instructions on how to use:
+- UI Designed for use with a Gamepad.
+- Window Switching (Similar to Window's Alt-Tab but with a Gamepad!).
+- Audio Output and Input devices can be switched on command by opening the Main Window and pressing DPAD Right to open the Audio Device menu.
+- Task Management (lite): Too many windows? Simply close them by pressing 'X' on the Gamepad and the program will tell the application to close.
+- Minimize Windows - Press 'Y' to minimize windows. 'nuff said.
+- Select (or restore) Windows and bring them to focus by pressing 'A' on the Gamepad!
+- Close the menu (Minimize to tray) by either selecting a window with 'A' or pressing 'B' to simply minmimize the application. 
 
-Hold L1+R1+Dpad Left to display the overlay and select from the available windows which one you want to bring to focus by navigating with Dpad up & down. 'A' selects the window and 'B' hides the window if you want to cancel.
+Button Combinations:
 
-1.0.0
+◇ L1+R1+DPAD LEFT = Show overlay.
 
-Initial release
+◇ DPAD Up/Down = Navigate through a list of open windows.
 
-Task Switcher
+◇ Y = Minimize window.
 
-Enter 'Task Switcher' by pressing a button combination: L1+R1+DPAD LEFT.
+◇ X = Close window process.
 
-◇ Navigate through a list of open processes/windows using the 'DPAD'.
+◇ A = Confirm or Select to restore the window and bring it to focus.
 
-◇ Minimize windows by pressing 'Y'.
+◇ B = Exit.
 
-◇ Kill window processes by pressing 'X'.
-
-◇ Confirm or Select a window to restore or bring to focus by pressing 'A'.
-
-◇ Exit Task Switcher by pressing 'B'.
+◇ Open Audio Device menu
