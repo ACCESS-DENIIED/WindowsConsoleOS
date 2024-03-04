@@ -14,7 +14,7 @@ Current Features:
 
 Button Combinations:
 
-◇ L1+R1+DPAD LEFT = Enter 'Task Switcher'.
+◇ L1+R1+DPAD LEFT = Show Overlay.
 
 ◇ DPAD Up/Down = Navigate through a list of open windows.
 
