@@ -391,6 +391,7 @@ namespace WindowSelector
                     {
                         this.Hide();
                         trayIcon.Visible = true;
+                        HideAudioDevicesPopup();
                     }
                 }
             }
@@ -456,14 +457,13 @@ namespace WindowSelector
             if (apply)
             {
                 var blur = new BlurEffect();
-                RootPanel.Effect = blur; // Change from MainContent to RootPanel
+                RootPanel.Effect = blur;
 
-                // Create and configure the animation
                 var animation = new DoubleAnimation
                 {
                     From = 0,
                     To = 25, // Target blur radius
-                    Duration = TimeSpan.FromSeconds(0.5), // Animation duration of 0.5 seconds
+                    Duration = TimeSpan.FromSeconds(0.5),
                     FillBehavior = FillBehavior.Stop // Stops the animation at its final value
                 };
 
@@ -472,15 +472,15 @@ namespace WindowSelector
             }
             else
             {
-                if (RootPanel.Effect is BlurEffect blur) // Change from MainContent to RootPanel
+                if (RootPanel.Effect is BlurEffect blur)
                 {
                     var animation = new DoubleAnimation
                     {
                         To = 0, // Animate back to no blur
-                        Duration = TimeSpan.FromSeconds(0.5), // Animation duration of 0.5 seconds
+                        Duration = TimeSpan.FromSeconds(0.5),
                     };
 
-                    animation.Completed += (s, e) => RootPanel.Effect = null; // Change from MainContent to RootPanel
+                    animation.Completed += (s, e) => RootPanel.Effect = null;
                     blur.BeginAnimation(BlurEffect.RadiusProperty, animation);
                 }
             }
@@ -604,7 +604,6 @@ namespace WindowSelector
             {
                 try
                 {
-                    // Assuming SetDefaultAudioDeviceAsync is a method that changes the audio device based on the device ID
                     await SetDefaultAudioDeviceAsync(selectedDevice.Id);
                 }
                 catch (Exception ex)
@@ -785,6 +784,7 @@ namespace WindowSelector
                 trayIcon.Dispose();
             }
             base.OnClosing(e);
+            HideAudioDevicesPopup();
         }
 
         private void RestoreWindowFromTray()
@@ -808,6 +808,9 @@ namespace WindowSelector
             this.Top = 0;
             this.Width = SystemParameters.VirtualScreenWidth;
             this.Height = SystemParameters.VirtualScreenHeight;
+
+            // Hide the popup, if it's open
+            HideAudioDevicesPopup();
 
             // SetForegroundWindow call
             IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
@@ -862,7 +865,7 @@ namespace WindowSelector
 
             foreach (Process process in Process.GetProcesses())
             {
-                // Remove "WindowsConsoleOS" and "TextInputHost" processes from the list
+                // Remove process/window names that are useless to us
                 if (!string.IsNullOrEmpty(process.MainWindowTitle) &&
                     !process.ProcessName.Equals("WindowsConsoleOS", StringComparison.OrdinalIgnoreCase) &&
                     !process.ProcessName.Equals("TextInputHost", StringComparison.OrdinalIgnoreCase) &&
