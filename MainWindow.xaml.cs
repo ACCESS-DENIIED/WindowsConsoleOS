@@ -128,6 +128,41 @@ namespace WindowSelector
         }
     }
 
+    public class SimplifyDeviceNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var fullName = value as string;
+            if (string.IsNullOrEmpty(fullName)) return "";
+
+            // Example logic to trim after the first occurrence of '('
+            var simplifiedName = fullName.Split('(')[0].Trim();
+            return simplifiedName;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class CompositeConverter : IValueConverter
+    {
+        public IValueConverter First { get; set; }
+        public IValueConverter Second { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var firstResult = First.Convert(value, targetType, parameter, culture);
+            return Second.Convert(firstResult, targetType, parameter, culture);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public partial class MainWindow : Window
     {
         private readonly Controller controller;
