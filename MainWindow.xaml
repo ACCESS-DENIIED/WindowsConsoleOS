@@ -16,10 +16,6 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
-        <!-- Specific style for the tab headers -->
-        <Style x:Key="TabItemHeaderStyle" TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
-            <Setter Property="Foreground" Value="#03acf1"/>
-        </Style>
         <SolidColorBrush x:Key="PrimaryColor" Color="#FF6200EE"/>
         <SolidColorBrush x:Key="SecondaryColor" Color="#FF03DAC6"/>
         <SolidColorBrush x:Key="BackgroundColor" Color="#FF121212"/>
@@ -150,7 +146,7 @@
                     <Border x:Name="PopupContent" 
                             HorizontalAlignment="Center" 
                             Background="#DD000000" 
-                            Margin="25" 
+                            Margin="50" 
                             BorderBrush="#1A1A1A" 
                             BorderThickness="2" 
                             CornerRadius="5"
@@ -159,37 +155,48 @@
                             <TranslateTransform X="0"/>
                         </Border.RenderTransform>
                         <StackPanel>
-                            <TextBlock Text="                              SELECT AUDIO DEVICE                             "
+                            <TextBlock Text="SELECT AUDIO DEVICE"
                                        FontFamily="./#Inter Black" 
-                                       FontSize="24" 
+                                       FontSize="48" 
                                        FontWeight="Bold" 
                                        Foreground="Purple"
-                                       Margin="20,10,20,0" 
+                                       Margin="20,35,20,0" 
                                        HorizontalAlignment="Center"/>
                             <StackPanel x:Name="ContentPanel" Visibility="Visible">
                                 <TextBlock x:Name="LoadingTextBlock" 
                                                Text="LOADING..." 
                                                Foreground="White" 
                                                FontFamily="./#Inter Black" 
-                                               FontSize="18" 
+                                               FontSize="36" 
                                                HorizontalAlignment="Center" 
-                                               Margin="30" 
+                                               Margin="15" 
                                                Visibility="Collapsed"/>
-                                <Border Background="#DD000000" CornerRadius="5" Margin="25">
+                                <Border Background="Transparent" CornerRadius="5" Margin="25">
                                     <StackPanel>
-                                        <TabControl x:Name="AudioDeviceTabs">
-                                            <TabItem Header="OUTPUT" Style="{StaticResource TabItemHeaderStyle}">
+                                        <TabControl x:Name="AudioDeviceTabs" Margin="0,10,0,10">
+                                            <TabItem>
+                                                <TabItem.Header>
+                                                    <TextBlock Text="OUTPUT" 
+                                                                   FontSize="32" 
+                                                                   Foreground="#03acf1" 
+                                                                   HorizontalAlignment="Center" 
+                                                                   VerticalAlignment="Center"/>
+                                                </TabItem.Header>
                                                 <ListBox x:Name="AudioOutputDeviceList" 
                                                          HorizontalContentAlignment="Stretch" 
                                                          Background="Transparent" 
-                                                         Foreground="White">
+                                                         Foreground="White"
+                                                         Margin="0,50,0,0">
                                                     <ListBox.ItemContainerStyle>
                                                         <Style TargetType="ListBoxItem">
+                                                            <Setter Property="Padding" Value="0"/>
+                                                            <Setter Property="Margin" Value="10"/>
+                                                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                                             <Setter Property="Background" Value="Transparent"/>
                                                             <Setter Property="Foreground" Value="White"/>
                                                             <Setter Property="BorderThickness" Value="0"/>
-                                                            <Setter Property="Padding" Value="10"/>
-                                                            <Setter Property="Margin" Value="5"/>
+                                                            <Setter Property="Height" Value="Auto"/>
                                                             <Setter Property="Template">
                                                                 <Setter.Value>
                                                                     <ControlTemplate TargetType="ListBoxItem">
@@ -216,36 +223,46 @@
                                                     </ListBox.ItemContainerStyle>
                                                     <ListBox.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Button Style="{StaticResource MaterialDesignFlatButton}">
-                                                                <StackPanel Orientation="Horizontal" Margin="5">
+                                                            <Button Style="{StaticResource MaterialDesignFlatButton}" Padding="0">
+                                                                <StackPanel Orientation="Horizontal">
                                                                     <materialDesign:PackIcon Kind="Speaker" 
-                                                                             VerticalAlignment="Center" 
-                                                                             Margin="5,0" 
-                                                                             Foreground="White"/>
+                                                                                             VerticalAlignment="Center" 
+                                                                                             Margin="0,0,0,0" 
+                                                                                             Foreground="White"/>
                                                                     <TextBlock Text="{Binding Name, Converter={StaticResource StringToUpperConverter}}" 
-                                                                             FontSize="16" 
-                                                                             FontWeight="Medium" 
-                                                                             Foreground="White" 
-                                                                             VerticalAlignment="Center" 
-                                                                             Margin="10,0"/>
+                                                                               FontSize="24"
+                                                                               FontWeight="Medium" 
+                                                                               Foreground="White" 
+                                                                               VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </Button>
                                                         </DataTemplate>
                                                     </ListBox.ItemTemplate>
                                                 </ListBox>
                                             </TabItem>
-                                            <TabItem Header="INPUT" Style="{StaticResource TabItemHeaderStyle}">
+                                            <TabItem>
+                                                <TabItem.Header>
+                                                    <TextBlock Text="INPUT" 
+                                                               FontSize="32" 
+                                                               Foreground="#03acf1" 
+                                                               HorizontalAlignment="Center" 
+                                                               VerticalAlignment="Center"/>
+                                                </TabItem.Header>
                                                 <ListBox x:Name="AudioInputDeviceList" 
                                                          HorizontalContentAlignment="Stretch" 
                                                          Background="Transparent" 
-                                                         Foreground="White">
+                                                         Foreground="White"
+                                                         Margin="0,50,0,0">
                                                     <ListBox.ItemContainerStyle>
                                                         <Style TargetType="ListBoxItem">
+                                                            <Setter Property="Padding" Value="0"/>
+                                                            <Setter Property="Margin" Value="10"/>
+                                                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                                             <Setter Property="Background" Value="Transparent"/>
                                                             <Setter Property="Foreground" Value="White"/>
                                                             <Setter Property="BorderThickness" Value="0"/>
-                                                            <Setter Property="Padding" Value="10"/>
-                                                            <Setter Property="Margin" Value="5"/>
+                                                            <Setter Property="Height" Value="Auto"/>
                                                             <Setter Property="Template">
                                                                 <Setter.Value>
                                                                     <ControlTemplate TargetType="ListBoxItem">
@@ -272,18 +289,17 @@
                                                     </ListBox.ItemContainerStyle>
                                                     <ListBox.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Button Style="{StaticResource MaterialDesignFlatButton}">
-                                                                <StackPanel Orientation="Horizontal" Margin="5">
-                                                                    <materialDesign:PackIcon Kind="Microphone" 
+                                                            <Button Style="{StaticResource MaterialDesignFlatButton}" Padding="0">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <materialDesign:PackIcon Kind="Microphone"
                                                                                              VerticalAlignment="Center" 
-                                                                                             Margin="5,0" 
+                                                                                             Margin="10,0,0,0" 
                                                                                              Foreground="White"/>
                                                                     <TextBlock Text="{Binding Name, Converter={StaticResource StringToUpperConverter}}" 
-                                                                                             FontSize="16" 
-                                                                                             FontWeight="Medium" 
-                                                                                             Foreground="White" 
-                                                                                             VerticalAlignment="Center" 
-                                                                                             Margin="10,0"/>
+                                                                               FontSize="24"
+                                                                               FontWeight="Medium" 
+                                                                               Foreground="White" 
+                                                                               VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </Button>
                                                         </DataTemplate>
@@ -304,9 +320,9 @@
                         Width="400" Height="100" 
                         Margin="10">
             <Image Source="Legend.png"
-                           Width="600" 
+                           Width="550" 
                            Canvas.Right="14" 
-                           Canvas.Bottom="175"/>
+                           Canvas.Bottom="25"/>
         </Canvas>
     </DockPanel>
 </Window>

@@ -185,7 +185,7 @@ namespace WindowSelector
             if (!trayIcon.Visible)
             {
                 trayIcon.Visible = true;
-                this.Hide(); // !debug
+                //this.Hide(); // !debug
             }
         }
 
@@ -848,6 +848,7 @@ namespace WindowSelector
             { "eadesktop", "EA Launcher"  },
             { "playnite.fullscreenapp", "Playnite Fullscreen"  },
             { "playnite.desktopapp", "Playnite Desktop"  },
+            { "ubc", "Ubisoft Connect"  },
             // Add more mappings as and when required
         };
 
