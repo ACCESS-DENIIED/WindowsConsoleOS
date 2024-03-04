@@ -107,6 +107,13 @@ namespace WindowSelector
         }
     }
 
+    public class AudioDevice
+    {
+        public string Name { get; set; }
+        public Guid Id { get; set; }
+        public bool IsInput { get; set; } // True for input devices, false for output
+    }
+
     // Convert window titles to uppercase function
     public class StringToUpperConverter : IValueConverter
     {
@@ -446,15 +453,26 @@ namespace WindowSelector
                 return;
             }
 
+            var combinedDeviceList = new List<AudioDevice>();
+
             await Task.Run(() =>
             {
                 var controller = new CoreAudioController();
-                audioDeviceCache = controller.GetPlaybackDevices(AudioSwitcher.AudioApi.DeviceState.Active).ToList();
+                // Fetch output devices
+                var outputDevices = controller.GetPlaybackDevices(AudioSwitcher.AudioApi.DeviceState.Active)
+                    .Select(d => new AudioDevice { Name = d.FullName, Id = d.Id, IsInput = false }).ToList();
+
+                // Fetch input devices
+                var inputDevices = controller.GetCaptureDevices(AudioSwitcher.AudioApi.DeviceState.Active)
+                    .Select(d => new AudioDevice { Name = d.FullName, Id = d.Id, IsInput = true }).ToList();
+
+                combinedDeviceList.AddRange(outputDevices);
+                combinedDeviceList.AddRange(inputDevices);
             });
 
             Dispatcher.Invoke(() =>
             {
-                AudioDeviceList.ItemsSource = audioDeviceCache;
+                AudioDeviceList.ItemsSource = combinedDeviceList;
                 shouldUpdateDevices = false; // Reset the flag
                 LoadingTextBlock.Visibility = Visibility.Collapsed;
                 AudioDeviceList.Visibility = Visibility.Visible;
