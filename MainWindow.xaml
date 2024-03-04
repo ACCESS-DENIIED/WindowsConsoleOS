@@ -159,58 +159,122 @@
                                                Margin="30" 
                                                Visibility="Collapsed"/>
                                 <Border Background="#DD000000" CornerRadius="1" Margin="25">
-                                    <ListBox x:Name="AudioDeviceList" 
-                                             HorizontalContentAlignment="Stretch" 
-                                             Background="Transparent" 
-                                             Foreground="White">
-                                        <ListBox.ItemContainerStyle>
-                                            <Style TargetType="ListBoxItem">
-                                                <Setter Property="Background" Value="Transparent"/>
-                                                <Setter Property="Foreground" Value="White"/>
-                                                <Setter Property="BorderThickness" Value="0"/>
-                                                <Setter Property="Padding" Value="10"/>
-                                                <Setter Property="Margin" Value="5"/>
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="ListBoxItem">
-                                                            <Border x:Name="Bd"
+                                    <StackPanel>
+                                        <TabControl x:Name="AudioDeviceTabs">
+                                            <TabItem Header="OUTPUT">
+                                                <ListBox x:Name="AudioOutputDeviceList" 
+                                                         HorizontalContentAlignment="Stretch" 
+                                                         Background="Transparent" 
+                                                         Foreground="White">
+                                                    <ListBox.ItemContainerStyle>
+                                                        <Style TargetType="ListBoxItem">
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                            <Setter Property="BorderThickness" Value="0"/>
+                                                            <Setter Property="Padding" Value="10"/>
+                                                            <Setter Property="Margin" Value="5"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                                        <Border x:Name="Bd"
                                                                 Background="{TemplateBinding Background}"
                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                 BorderThickness="{TemplateBinding BorderThickness}"
                                                                 CornerRadius="1">
-                                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <Trigger Property="IsFocused" Value="True">
-                                                                    <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
-                                                                </Trigger>
-                                                                <Trigger Property="IsSelected" Value="True">
-                                                                    <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
-                                                                </Trigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </ListBox.ItemContainerStyle>
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" Margin="5">
-                                                    <materialDesign:PackIcon Kind="Speaker" 
-                                         VerticalAlignment="Center" 
-                                         Margin="5,0" 
-                                         Foreground="White"/>
-                                                    <TextBlock Text="{Binding Name}" 
-                           FontSize="16" 
-                           FontWeight="Medium" 
-                           Foreground="White" 
-                           VerticalAlignment="Center" 
-                           Margin="10,0"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                            <Trigger Property="IsFocused" Value="True">
+                                                                                <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
+                                                                            </Trigger>
+                                                                            <Trigger Property="IsSelected" Value="True">
+                                                                                <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
+                                                                            </Trigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </ListBox.ItemContainerStyle>
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button Style="{StaticResource MaterialDesignFlatButton}">
+                                                                <StackPanel Orientation="Horizontal" Margin="5">
+                                                                    <materialDesign:PackIcon Kind="Speaker" 
+                                                                             VerticalAlignment="Center" 
+                                                                             Margin="5,0" 
+                                                                             Foreground="White"/>
+                                                                    <TextBlock Text="{Binding Name}" 
+                                                                             FontSize="16" 
+                                                                             FontWeight="Medium" 
+                                                                             Foreground="White" 
+                                                                             VerticalAlignment="Center" 
+                                                                             Margin="10,0"/>
+                                                                </StackPanel>
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </TabItem>
+                                            <TabItem Header="INPUT">
+                                                <ListBox x:Name="AudioInputDeviceList" 
+                                                         HorizontalContentAlignment="Stretch" 
+                                                         Background="Transparent" 
+                                                         Foreground="White">
+                                                    <ListBox.ItemContainerStyle>
+                                                        <Style TargetType="ListBoxItem">
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                            <Setter Property="BorderThickness" Value="0"/>
+                                                            <Setter Property="Padding" Value="10"/>
+                                                            <Setter Property="Margin" Value="5"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                                        <Border x:Name="Bd"
+                                                                                Background="{TemplateBinding Background}"
+                                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                                CornerRadius="1">
+                                                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                            <Trigger Property="IsFocused" Value="True">
+                                                                                <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
+                                                                            </Trigger>
+                                                                            <Trigger Property="IsSelected" Value="True">
+                                                                                <Setter TargetName="Bd" Property="Background" Value="#03acf1"/>
+                                                                            </Trigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </ListBox.ItemContainerStyle>
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button Style="{StaticResource MaterialDesignFlatButton}">
+                                                                <StackPanel Orientation="Horizontal" Margin="5">
+                                                                    <materialDesign:PackIcon Kind="Speaker" 
+                                                                                             VerticalAlignment="Center" 
+                                                                                             Margin="5,0" 
+                                                                                             Foreground="White"/>
+                                                                    <TextBlock Text="{Binding Name}" 
+                                                                                             FontSize="16" 
+                                                                                             FontWeight="Medium" 
+                                                                                             Foreground="White" 
+                                                                                             VerticalAlignment="Center" 
+                                                                                             Margin="10,0"/>
+                                                                </StackPanel>
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </TabItem>
+                                        </TabControl>
+                                    </StackPanel>
                                 </Border>
                             </StackPanel>
                         </StackPanel>

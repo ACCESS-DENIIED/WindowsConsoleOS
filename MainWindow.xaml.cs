@@ -251,24 +251,39 @@ namespace WindowSelector
 
             if (AudioDevicesPopup.IsOpen)
             {
-                // Handle input specifically for the AudioDeviceList
-                var comboBox = AudioDeviceList;
-                if (listboxUp && comboBox.SelectedIndex > 0)
+                // Determine which ListBox is currently active/visible based on the selected tab
+                TabItem selectedTab = (TabItem)AudioDeviceTabs.SelectedItem; // Assuming AudioDeviceTabs is your TabControl's name
+                System.Windows.Controls.ListBox currentListBox = null;
+
+                if (selectedTab.Header.ToString() == "Output Devices")
                 {
-                    comboBox.SelectedIndex--;
+                    currentListBox = AudioOutputDeviceList;
                 }
-                else if (listboxDown && comboBox.SelectedIndex < comboBox.Items.Count - 1)
+                else if (selectedTab.Header.ToString() == "Input Devices")
                 {
-                    comboBox.SelectedIndex++;
+                    currentListBox = AudioInputDeviceList;
                 }
-                else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.A) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.A))
+
+                if (currentListBox != null)
                 {
-                    ChangeAudioDeviceToSelected(null, null);
-                    HideAudioDevicesPopup();
-                }
-                else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
-                {
-                    HideAudioDevicesPopup();
+                    if (listboxUp && currentListBox.SelectedIndex > 0)
+                    {
+                        currentListBox.SelectedIndex--;
+                    }
+                    else if (listboxDown && currentListBox.SelectedIndex < currentListBox.Items.Count - 1)
+                    {
+                        currentListBox.SelectedIndex++;
+                    }
+                    else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.A) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.A))
+                    {
+                        // Assuming ChangeAudioDeviceToSelected can handle selection from both lists
+                        ChangeAudioOutputDeviceToSelected(currentListBox.SelectedItem, null);
+                        HideAudioDevicesPopup();
+                    }
+                    else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
+                    {
+                        HideAudioDevicesPopup();
+                    }
                 }
             }
             else
@@ -442,40 +457,29 @@ namespace WindowSelector
         {
             LoadingTextBlock.Visibility = Visibility.Visible;
 
-            if (!shouldUpdateDevices && audioDeviceCache != null)
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    AudioDeviceList.ItemsSource = audioDeviceCache;
-                    LoadingTextBlock.Visibility = Visibility.Visible;
-                    AudioDeviceList.Visibility = Visibility.Collapsed;
-                });
-                return;
-            }
-
-            var combinedDeviceList = new List<AudioDevice>();
+            // Separate lists for input and output devices
+            var outputDeviceList = new List<AudioDevice>();
+            var inputDeviceList = new List<AudioDevice>();
 
             await Task.Run(() =>
             {
                 var controller = new CoreAudioController();
                 // Fetch output devices
-                var outputDevices = controller.GetPlaybackDevices(AudioSwitcher.AudioApi.DeviceState.Active)
+                outputDeviceList = controller.GetPlaybackDevices(AudioSwitcher.AudioApi.DeviceState.Active)
                     .Select(d => new AudioDevice { Name = d.FullName, Id = d.Id, IsInput = false }).ToList();
 
                 // Fetch input devices
-                var inputDevices = controller.GetCaptureDevices(AudioSwitcher.AudioApi.DeviceState.Active)
+                inputDeviceList = controller.GetCaptureDevices(AudioSwitcher.AudioApi.DeviceState.Active)
                     .Select(d => new AudioDevice { Name = d.FullName, Id = d.Id, IsInput = true }).ToList();
-
-                combinedDeviceList.AddRange(outputDevices);
-                combinedDeviceList.AddRange(inputDevices);
             });
 
             Dispatcher.Invoke(() =>
             {
-                AudioDeviceList.ItemsSource = combinedDeviceList;
+                AudioOutputDeviceList.ItemsSource = outputDeviceList;
+                AudioInputDeviceList.ItemsSource = inputDeviceList;
                 shouldUpdateDevices = false; // Reset the flag
                 LoadingTextBlock.Visibility = Visibility.Collapsed;
-                AudioDeviceList.Visibility = Visibility.Visible;
+                AudioOutputDeviceList.Visibility = Visibility.Visible; // Make the list visible
             });
         }
 
@@ -541,9 +545,9 @@ namespace WindowSelector
             return devices;
         }
 
-        private async void ChangeAudioDeviceToSelected(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private async void ChangeAudioOutputDeviceToSelected(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (AudioDeviceList.SelectedItem is CoreAudioDevice selectedDevice)
+            if (AudioOutputDeviceList.SelectedItem is CoreAudioDevice selectedDevice)
             {
                 try
                 {
@@ -554,17 +558,6 @@ namespace WindowSelector
                 {
                     MessageBox.Show($"Error setting default audio device or initializing playback: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-
-            if (e.KeyboardDevice.Modifiers == ModifierKeys.Alt && e.Key == Key.B)
-            {
-                // Toggle the visibility of the fullscreen menu
-                AudioDeviceList.Visibility = AudioDeviceList.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
             }
         }
 
