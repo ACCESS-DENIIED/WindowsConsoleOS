@@ -16,6 +16,9 @@
 
     <Window.Resources>
         <local:SimplifyDeviceNameConverter x:Key="SimplifyDeviceNameConverter"/>
+        <Style x:Key="TabItemHeaderStyle" TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+            <Setter Property="Foreground" Value="#03acf1"/>
+        </Style>
         <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
         <local:CompositeConverter x:Key="CompositeDeviceNameConverter" 
                               First="{StaticResource SimplifyDeviceNameConverter}" 
@@ -174,7 +177,7 @@
                                                FontSize="36" 
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
-                                               Margin="0,25,0,25" 
+                                               Margin="25,25,25,25" 
                                                Visibility="Collapsed"/>
                                 <Border Background="Transparent" CornerRadius="5" Margin="25">
                                     <StackPanel>
@@ -182,8 +185,7 @@
                                             <TabItem>
                                                 <TabItem.Header>
                                                     <TextBlock Text="OUTPUT" 
-                                                                   FontSize="32" 
-                                                                   Foreground="#03acf1" 
+                                                                   FontSize="32"
                                                                    HorizontalAlignment="Center" 
                                                                    VerticalAlignment="Center"/>
                                                 </TabItem.Header>
@@ -250,8 +252,7 @@
                                             <TabItem>
                                                 <TabItem.Header>
                                                     <TextBlock Text="INPUT" 
-                                                               FontSize="32" 
-                                                               Foreground="#03acf1" 
+                                                               FontSize="32"
                                                                HorizontalAlignment="Center" 
                                                                VerticalAlignment="Center"/>
                                                 </TabItem.Header>
