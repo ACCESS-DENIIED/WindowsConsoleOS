@@ -16,6 +16,10 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <!-- Specific style for the tab headers -->
+        <Style x:Key="TabItemHeaderStyle" TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+            <Setter Property="Foreground" Value="#03acf1"/>
+        </Style>
         <SolidColorBrush x:Key="PrimaryColor" Color="#FF6200EE"/>
         <SolidColorBrush x:Key="SecondaryColor" Color="#FF03DAC6"/>
         <SolidColorBrush x:Key="BackgroundColor" Color="#FF121212"/>
@@ -25,12 +29,24 @@
         <local:LazyImageLoader x:Key="LazyImageLoader"/>
         <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
         <Storyboard x:Key="OpenAudioDevicePopupAnimation">
-            <DoubleAnimation Duration="0:0:0.3" From="300" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"/>
-            <DoubleAnimation Duration="0:0:0.3" To="1" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0" Value="100"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
         </Storyboard>
         <Storyboard x:Key="CloseAudioDevicePopupAnimation">
-            <DoubleAnimation Duration="0:0:0.3" From="0" To="300" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"/>
-            <DoubleAnimation Duration="0:0:0.3" To="0" Storyboard.TargetName="PopupContent" Storyboard.TargetProperty="Opacity"/>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="100"/>
+            </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
 
@@ -128,19 +144,17 @@
                        AllowsTransparency="True" 
                        IsOpen="False">
                 <Grid>
-                    <Border Margin="25" CornerRadius="1" BorderThickness="1" BorderBrush="#03acf1">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="30" 
-                                      Color="#03acf1" 
-                                      Opacity="0.5" 
-                                      ShadowDepth="0" />
-                        </Border.Effect>
+                    <Border Margin="25" CornerRadius="1">
                     </Border>
                     <Border x:Name="PopupContent" 
                             HorizontalAlignment="Center" 
                             Background="#DD000000" 
                             Margin="25" 
-                            CornerRadius="1">
+                            CornerRadius="1"
+                            RenderTransformOrigin="1,0.5">
+                        <Border.RenderTransform>
+                            <TranslateTransform X="0"/>
+                        </Border.RenderTransform>
                         <StackPanel>
                             <TextBlock Text="                              SELECT AUDIO DEVICE                             "
                                        FontFamily="./#Inter Black" 
@@ -161,7 +175,7 @@
                                 <Border Background="#DD000000" CornerRadius="1" Margin="25">
                                     <StackPanel>
                                         <TabControl x:Name="AudioDeviceTabs">
-                                            <TabItem Header="OUTPUT">
+                                            <TabItem Header="OUTPUT" Style="{StaticResource TabItemHeaderStyle}">
                                                 <ListBox x:Name="AudioOutputDeviceList" 
                                                          HorizontalContentAlignment="Stretch" 
                                                          Background="Transparent" 
@@ -177,10 +191,10 @@
                                                                 <Setter.Value>
                                                                     <ControlTemplate TargetType="ListBoxItem">
                                                                         <Border x:Name="Bd"
-                                                                Background="{TemplateBinding Background}"
-                                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                                CornerRadius="1">
+                                                                                Background="{TemplateBinding Background}"
+                                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                                CornerRadius="1">
                                                                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                                                         </Border>
@@ -217,7 +231,7 @@
                                                     </ListBox.ItemTemplate>
                                                 </ListBox>
                                             </TabItem>
-                                            <TabItem Header="INPUT">
+                                            <TabItem Header="INPUT" Style="{StaticResource TabItemHeaderStyle}">
                                                 <ListBox x:Name="AudioInputDeviceList" 
                                                          HorizontalContentAlignment="Stretch" 
                                                          Background="Transparent" 
@@ -257,7 +271,7 @@
                                                         <DataTemplate>
                                                             <Button Style="{StaticResource MaterialDesignFlatButton}">
                                                                 <StackPanel Orientation="Horizontal" Margin="5">
-                                                                    <materialDesign:PackIcon Kind="Speaker" 
+                                                                    <materialDesign:PackIcon Kind="Microphone" 
                                                                                              VerticalAlignment="Center" 
                                                                                              Margin="5,0" 
                                                                                              Foreground="White"/>
