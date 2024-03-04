@@ -251,33 +251,31 @@ namespace WindowSelector
 
             if (AudioDevicesPopup.IsOpen)
             {
-                // Determine which ListBox is currently active/visible based on the selected tab
-                TabItem selectedTab = (TabItem)AudioDeviceTabs.SelectedItem; // Assuming AudioDeviceTabs is your TabControl's name
-                System.Windows.Controls.ListBox currentListBox = null;
-
-                if (selectedTab.Header.ToString() == "Output Devices")
+                // Switch between input and output using DPad left and right
+                if (dpadRightPressed && AudioDeviceTabs.SelectedIndex < AudioDeviceTabs.Items.Count - 1)
                 {
-                    currentListBox = AudioOutputDeviceList;
+                    AudioDeviceTabs.SelectedIndex++;
                 }
-                else if (selectedTab.Header.ToString() == "Input Devices")
+                else if (dpadLeftPressed && AudioDeviceTabs.SelectedIndex > 0)
                 {
-                    currentListBox = AudioInputDeviceList;
+                    AudioDeviceTabs.SelectedIndex--;
                 }
-
-                if (currentListBox != null)
+                else
                 {
-                    if (listboxUp && currentListBox.SelectedIndex > 0)
+                    // Handle input specifically for the selected device list (input or output)
+                    var selectedTab = AudioDeviceTabs.SelectedItem as TabItem;
+                    var listBox = selectedTab.Content as System.Windows.Controls.ListBox;
+                    if (listboxUp && listBox.SelectedIndex > 0)
                     {
-                        currentListBox.SelectedIndex--;
+                        listBox.SelectedIndex--;
                     }
-                    else if (listboxDown && currentListBox.SelectedIndex < currentListBox.Items.Count - 1)
+                    else if (listboxDown && listBox.SelectedIndex < listBox.Items.Count - 1)
                     {
-                        currentListBox.SelectedIndex++;
+                        listBox.SelectedIndex++;
                     }
                     else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.A) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.A))
                     {
-                        // Assuming ChangeAudioDeviceToSelected can handle selection from both lists
-                        ChangeAudioOutputDeviceToSelected(currentListBox.SelectedItem, null);
+                        ChangeAudioDeviceToSelected(null, null);
                         HideAudioDevicesPopup();
                     }
                     else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
@@ -545,7 +543,7 @@ namespace WindowSelector
             return devices;
         }
 
-        private async void ChangeAudioOutputDeviceToSelected(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private async void ChangeAudioDeviceToSelected(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (AudioOutputDeviceList.SelectedItem is CoreAudioDevice selectedDevice)
             {
