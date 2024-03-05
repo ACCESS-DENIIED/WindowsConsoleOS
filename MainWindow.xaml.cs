@@ -188,6 +188,13 @@ namespace WindowSelector
             refreshTimer.Tick += (sender, e) => RefreshWindowTitlesIfNeeded();
             refreshTimer.Start();
 
+            // Initialize knownWindowHandles to force the first refresh
+            var initialWindows = GetOpenWindows();
+            knownWindowHandles = new HashSet<IntPtr>(initialWindows.Select(w => w.MainWindowHandle));
+
+            // Explicitly populate the window list at startup with the current windows
+            RefreshWindowTitles(initialWindows); // Now correctly passing the initialWindows as the argument
+
             this.WindowState = WindowState.Maximized;
             this.Width = SystemParameters.PrimaryScreenWidth;
             this.Height = SystemParameters.PrimaryScreenHeight;
@@ -238,7 +245,7 @@ namespace WindowSelector
         {
             gamepadTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(50) // Needs more adjustments
+                Interval = TimeSpan.FromMilliseconds(10) // Needs more adjustments
             };
             gamepadTimer.Tick += GamepadPollingTick;
             gamepadTimer.Start();
@@ -873,23 +880,6 @@ namespace WindowSelector
             IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
             AllowSetForegroundWindow(Process.GetCurrentProcess().Id);
             SetForegroundWindow(hwnd);
-        }
-
-        private void RefreshWindowTitles()
-        {
-            int selectedIndex = WindowListBox.SelectedIndex;
-            var processes = GetOpenWindows();
-            WindowListBox.ItemsSource = processes.Select(p =>
-            {
-                var item = new WindowItem
-                {
-                    Name = GetFriendlyName(p.ProcessName).ToUpper(),
-                    Process = p,
-                    WindowHandle = p.MainWindowHandle // Store the handle directly
-                };
-                return item;
-            }).ToList();
-            WindowListBox.SelectedIndex = Math.Min(selectedIndex, WindowListBox.Items.Count - 1);
         }
 
         private string GetFriendlyName(string processName)
