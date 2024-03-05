@@ -5,6 +5,7 @@
                 xmlns:local="clr-namespace:WindowSelector"
                 Title="MainWindow" Height="720" Width="1280"
                 AllowsTransparency="True"
+                ShowInTaskbar="False"
                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:ui="http://schemas.modernwpf.com/2019"
                 TextElement.Foreground="{DynamicResource MaterialDesignBody}"
                 Background="{DynamicResource MaterialDesignPaper}"
@@ -22,7 +23,7 @@
         <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
         <local:CompositeConverter x:Key="CompositeDeviceNameConverter" 
                               First="{StaticResource SimplifyDeviceNameConverter}" 
-                              Second="{StaticResource StringToUpperConverter}"/>    
+                              Second="{StaticResource StringToUpperConverter}"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
         <SolidColorBrush x:Key="PrimaryColor" Color="#FF6200EE"/>
         <SolidColorBrush x:Key="SecondaryColor" Color="#FF03DAC6"/>
