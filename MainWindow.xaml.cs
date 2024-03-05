@@ -199,6 +199,7 @@ namespace WindowSelector
             this.Width = SystemParameters.PrimaryScreenWidth;
             this.Height = SystemParameters.PrimaryScreenHeight;
 
+            this.ShowInTaskbar = false;
             trayIcon = new NotifyIcon();
             trayIcon.Icon = new System.Drawing.Icon("OS.ico");
             trayIcon.Visible = false;
@@ -227,6 +228,7 @@ namespace WindowSelector
             if (!trayIcon.Visible)
             {
                 trayIcon.Visible = true;
+                HideAudioDevicesPopup();
                 this.Hide(); // !debug
             }
         }
@@ -251,6 +253,9 @@ namespace WindowSelector
             gamepadTimer.Start();
         }
 
+        private bool previousDpadUpPressed = false;
+        private bool previousDpadDownPressed = false;
+
         private void GamepadPollingTick(object sender, EventArgs e)
         {
             if (!controller.IsConnected) return;
@@ -262,8 +267,8 @@ namespace WindowSelector
             bool dpadRightPressed = gamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadRight);
             bool yPressed = gamepadState.Buttons.HasFlag(GamepadButtonFlags.Y);
             bool xPressed = gamepadState.Buttons.HasFlag(GamepadButtonFlags.X);
-            bool listboxUp = gamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadUp);
-            bool listboxDown = gamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadDown);
+            bool windowListboxUp = gamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadUp);
+            bool windowListboxDown = gamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadDown);
 
             // Check if the current application is the active window
             IntPtr foregroundWindow = GetForegroundWindow();
@@ -282,15 +287,6 @@ namespace WindowSelector
                 return;
             }
 
-            // Restore window from tray if L1, R1, and DPad Left are pressed
-            if (l1Pressed && r1Pressed && dpadLeftPressed)
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    RestoreWindowFromTray();
-                });
-            }
-
             if (AudioDevicesPopup.IsOpen)
             {
                 // Prevent double dpad input when activating the popup
@@ -299,31 +295,44 @@ namespace WindowSelector
                     // Not enough time has passed, ignore the input
                     return;
                 }
+
                 // Directly select output or input tab using DPad left and right
-                if (dpadRightPressed)
-                {
-                    AudioDeviceTabs.SelectedIndex = 1; // Input tab selected
-                }
-                else if (dpadLeftPressed)
+                if (dpadLeftPressed)
                 {
                     AudioDeviceTabs.SelectedIndex = 0; // Output tab selected
+                }
+                else if (dpadRightPressed)
+                {
+                    AudioDeviceTabs.SelectedIndex = 1; // Input tab selected
                 }
                 else
                 {
                     // Handle input specifically for the selected device list (input or output)
                     var selectedTab = AudioDeviceTabs.SelectedItem as TabItem;
-                    var listBox = selectedTab.Content as System.Windows.Controls.ListBox;
-                    if (listboxUp && listBox.SelectedIndex > 0)
+                    var AudioDeviceListBox = selectedTab.Content as System.Windows.Controls.ListBox;
+
+                    // Ensure we only move the selection if the DPad was not previously pressed
+                    if (windowListboxUp && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadUp))
                     {
-                        listBox.SelectedIndex--;
+                        // Prevent index from going below 0
+                        if (AudioDeviceListBox.SelectedIndex > 0)
+                        {
+                            AudioDeviceListBox.SelectedIndex--;
+                        }
                     }
-                    else if (listboxDown && listBox.SelectedIndex < listBox.Items.Count - 1)
+                    else if (windowListboxDown && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadDown))
                     {
-                        listBox.SelectedIndex++;
+                        // Prevent index from exceeding the count of items
+                        if (AudioDeviceListBox.SelectedIndex < AudioDeviceListBox.Items.Count - 1)
+                        {
+                            AudioDeviceListBox.SelectedIndex++;
+                        }
                     }
+
+                    // confirm audio device selection
                     if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.A) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.A))
                     {
-                        var selectedDevice = listBox.SelectedItem as AudioDevice;
+                        var selectedDevice = AudioDeviceListBox.SelectedItem as AudioDevice;
 
                         if (selectedDevice != null)
                         {
@@ -331,11 +340,15 @@ namespace WindowSelector
                             HideAudioDevicesPopup();
                         }
                     }
-                    else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
+
+                    // close audio devices popup
+                    if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
                     {
                         HideAudioDevicesPopup();
                     }
                 }
+                // Save the current gamepad state for the next tick
+                previousGamepadState = gamepadState;
             }
             else
             {
@@ -346,15 +359,19 @@ namespace WindowSelector
                     {
                         this.Hide(); // Hide the main window
                         trayIcon.Visible = true; // Make sure the tray icon is visible
+                        HideAudioDevicesPopup();
                     });
                 }
+
                 if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.A) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.A))
                 {
                     aButtonPressed = true;
                     WindowListBox_SelectionChanged(WindowListBox, null);
                     this.Hide();
                     trayIcon.Visible = true;
+                    HideAudioDevicesPopup();
                 }
+
                 if (yPressed && !previousButtons.HasFlag(GamepadButtonFlags.Y))
                 {
                     // Minimize the selected window
@@ -368,7 +385,8 @@ namespace WindowSelector
                         }
                     }
                 }
-                else if (xPressed && !previousButtons.HasFlag(GamepadButtonFlags.X))
+
+                if (xPressed && !previousButtons.HasFlag(GamepadButtonFlags.X))
                 {
                     // More gracefully close the selected window
                     if (WindowListBox.SelectedItem != null)
@@ -396,30 +414,49 @@ namespace WindowSelector
                     }
                 }
 
-                if (listboxUp && !previousButtons.HasFlag(GamepadButtonFlags.DPadUp))
+                // DPad Up navigation logic
+                if (windowListboxUp)
                 {
-                    if (WindowListBox.SelectedIndex > 0)
+                    if (!previousDpadUpPressed)
                     {
-                        WindowListBox.SelectedIndex--;
-                        lastNavigationTime = DateTime.Now; // Update the last navigation time
+                        if (WindowListBox.SelectedIndex > 0)
+                        {
+                            WindowListBox.SelectedIndex--;
+                        }
+                        previousDpadUpPressed = true;
                     }
                 }
-                else if (listboxDown && !previousButtons.HasFlag(GamepadButtonFlags.DPadDown))
+                else
                 {
-                    if (WindowListBox.SelectedIndex < WindowListBox.Items.Count - 1)
+                    previousDpadUpPressed = false;
+                }
+
+                // DPad Down navigation logic
+                if (windowListboxDown)
+                {
+                    if (!previousDpadDownPressed)
                     {
-                        WindowListBox.SelectedIndex++;
-                        lastNavigationTime = DateTime.Now; // Update the last navigation time
+                        if (WindowListBox.SelectedIndex < WindowListBox.Items.Count - 1)
+                        {
+                            WindowListBox.SelectedIndex++;
+                        }
+                        previousDpadDownPressed = true;
                     }
                 }
-                else if (dpadRightPressed && !previousButtons.HasFlag(GamepadButtonFlags.DPadRight))
+                else
+                {
+                    previousDpadDownPressed = false;
+                }
+
+                if (dpadRightPressed && !previousButtons.HasFlag(GamepadButtonFlags.DPadRight))
                 {
                     // show list of audio devices
                     ShowAudioDevicesPopup();
 
                     lastMenuOpenTime = DateTime.Now;
                 }
-                else if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousButtons.HasFlag(GamepadButtonFlags.B))
+                
+                if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousButtons.HasFlag(GamepadButtonFlags.B))
                 {
                     if (!isAudioDeviceListVisible)
                     {
@@ -861,11 +898,6 @@ namespace WindowSelector
             // Ensure the window is brought to the foreground
             this.Activate();
             this.Focus();
-            this.Topmost = true; // Make the window topmost
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                this.Topmost = false; // Revert after a short delay
-            }), DispatcherPriority.ApplicationIdle);
 
             // Set dimensions
             this.Left = 0;
@@ -878,7 +910,7 @@ namespace WindowSelector
 
             // SetForegroundWindow call
             IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-            AllowSetForegroundWindow(Process.GetCurrentProcess().Id);
+            AllowSetForegroundWindow(ASFW_ANY);
             SetForegroundWindow(hwnd);
         }
 
