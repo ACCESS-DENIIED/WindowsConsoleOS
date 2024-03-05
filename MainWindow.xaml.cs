@@ -167,6 +167,8 @@ namespace WindowSelector
     {
         private readonly Controller controller;
 
+        private const int ASFW_ANY = -1;
+
         private NotifyIcon trayIcon;
         private GamepadButtonFlags previousButtons = GamepadButtonFlags.None;
         private DispatcherTimer gamepadTimer;
@@ -179,10 +181,10 @@ namespace WindowSelector
             InitializeMaterialDesign();
             InitializeGamepadPolling();
             PopulateAudioDevicesAsync();
+            AllowSetForegroundWindow(ASFW_ANY); // Allow any process to bring this window to foreground
 
-            // Refresh Window Titles regularly
             refreshTimer = new DispatcherTimer();
-            refreshTimer.Interval = TimeSpan.FromSeconds(2);
+            refreshTimer.Interval = TimeSpan.FromSeconds(1); // Adjust the interval as needed
             refreshTimer.Tick += (sender, e) => RefreshWindowTitlesIfNeeded();
             refreshTimer.Start();
 
@@ -208,8 +210,6 @@ namespace WindowSelector
             controller = new Controller(UserIndex.One);
 
             this.MouseDown += new MouseButtonEventHandler(MainWindow_MouseDown);
-
-            RefreshWindowTitles();
         }
 
         private DispatcherTimer refreshTimer;
@@ -612,13 +612,35 @@ namespace WindowSelector
 
         private bool isAudioDeviceListVisible = false;
 
+        private HashSet<IntPtr> knownWindowHandles = new HashSet<IntPtr>();
+
         private void RefreshWindowTitlesIfNeeded()
         {
-            if ((DateTime.Now - lastRefreshTime).TotalSeconds >= 1)
+            var currentWindows = GetOpenWindows();
+            var currentHandles = new HashSet<IntPtr>(currentWindows.Select(w => w.MainWindowHandle));
+
+            // Check if the set of window handles has changed since the last check
+            if (!currentHandles.SetEquals(knownWindowHandles))
             {
-                RefreshWindowTitles();
-                lastRefreshTime = DateTime.Now;
+                RefreshWindowTitles(currentWindows); // Pass the current windows to avoid fetching them again
+                knownWindowHandles = currentHandles; // Update the known handles
             }
+        }
+
+        private void RefreshWindowTitles(IEnumerable<Process> currentWindows)
+        {
+            int selectedIndex = WindowListBox.SelectedIndex;
+            WindowListBox.ItemsSource = currentWindows.Select(p =>
+            {
+                var item = new WindowItem
+                {
+                    Name = GetFriendlyName(p.ProcessName).ToUpper(),
+                    Process = p,
+                    WindowHandle = p.MainWindowHandle // Store the handle directly
+                };
+                return item;
+            }).ToList();
+            WindowListBox.SelectedIndex = Math.Min(selectedIndex, WindowListBox.Items.Count - 1);
         }
 
         private DateTime lastNavigationTime = DateTime.MinValue;
