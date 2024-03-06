@@ -455,7 +455,7 @@ namespace WindowSelector
 
                     lastMenuOpenTime = DateTime.Now;
                 }
-                
+
                 if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousButtons.HasFlag(GamepadButtonFlags.B))
                 {
                     if (!isAudioDeviceListVisible)
@@ -898,6 +898,11 @@ namespace WindowSelector
             // Ensure the window is brought to the foreground
             this.Activate();
             this.Focus();
+            this.Topmost = true; // Make the window topmost
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                this.Topmost = false; // Revert after a short delay
+            }), DispatcherPriority.ApplicationIdle);
 
             // Set dimensions
             this.Left = 0;

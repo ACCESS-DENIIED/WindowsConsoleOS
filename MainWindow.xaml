@@ -23,7 +23,7 @@
         <local:StringToUpperConverter x:Key="StringToUpperConverter"/>
         <local:CompositeConverter x:Key="CompositeDeviceNameConverter" 
                               First="{StaticResource SimplifyDeviceNameConverter}" 
-                              Second="{StaticResource StringToUpperConverter}"/>    
+                              Second="{StaticResource StringToUpperConverter}"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
         <SolidColorBrush x:Key="PrimaryColor" Color="#FF6200EE"/>
         <SolidColorBrush x:Key="SecondaryColor" Color="#FF03DAC6"/>
