@@ -38,6 +38,7 @@ using ComboBox = System.Windows.Forms.ComboBox;
 using System.Windows.Media.Effects;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
+using System.Windows.Interop;
 
 namespace WindowSelector
 {
@@ -183,6 +184,13 @@ namespace WindowSelector
             PopulateAudioDevicesAsync();
             AllowSetForegroundWindow(ASFW_ANY); // Allow any process to bring this window to foreground
 
+            if (this.WindowState == WindowState.Minimized)
+            {
+                this.WindowState = WindowState.Normal;
+            }
+            this.Activate();
+            BringApplicationToFront();
+
             refreshTimer = new DispatcherTimer();
             refreshTimer.Interval = TimeSpan.FromSeconds(1); // Adjust the interval as needed
             refreshTimer.Tick += (sender, e) => RefreshWindowTitlesIfNeeded();
@@ -221,6 +229,13 @@ namespace WindowSelector
         }
 
         private DispatcherTimer refreshTimer;
+
+        private void BringApplicationToFront()
+        {
+            var windowHandle = new WindowInteropHelper(this).Handle;
+            SetForegroundWindow(windowHandle);
+            BringWindowToTop(windowHandle);
+        }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -287,7 +302,25 @@ namespace WindowSelector
                 return;
             }
 
-            if (AudioDevicesPopup.IsOpen)
+            // Check if the application is minimized
+            if (this.WindowState == WindowState.Minimized)
+            {
+                // Restore window from tray if L1, R1, and DPad Left are pressed
+                if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) &&
+                    gamepadState.Buttons.HasFlag(GamepadButtonFlags.RightShoulder) &&
+                    gamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        RestoreWindowFromTray();
+                    });
+                }
+                else
+                {
+                    return; // Ignore other inputs if the application is minimized
+                }
+            }
+            else if (AudioDevicesPopup.IsOpen)
             {
                 // Prevent double dpad input when activating the popup
                 if ((DateTime.Now - lastMenuOpenTime).TotalMilliseconds < 150)
@@ -474,6 +507,19 @@ namespace WindowSelector
                     }
                 }
             }
+
+            if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
+            { // if the tray icon is not visible and the 'B' button is pressed, hide the main window to the tray
+                if (!trayIcon.Visible)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        this.Hide(); // Hide the main window
+                        trayIcon.Visible = true; // Make sure the tray icon is visible
+                        HideAudioDevicesPopup();
+                    });
+                }
+            }
             previousGamepadState = gamepadState;
         }
 
@@ -496,8 +542,6 @@ namespace WindowSelector
             AudioDevicesPopup.HorizontalOffset = windowLocation.X + windowWidth - popupWidth - 20;
             AudioDevicesPopup.VerticalOffset = windowLocation.Y + windowHeight - popupHeight - 20;
 
-            ApplyBlurEffectToMainWindowContent(true);
-
             // Now open the popup.
             AudioDevicesPopup.IsOpen = true;
 
@@ -508,6 +552,7 @@ namespace WindowSelector
                 Storyboard.SetTarget(popInStoryboard, PopupContent);
                 popInStoryboard.Begin();
             }
+            ApplyBlurEffectToMainWindowContent(true);
         }
 
         private void HideAudioDevicesPopup()
@@ -974,6 +1019,9 @@ namespace WindowSelector
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool BringWindowToTop(IntPtr hWnd);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
