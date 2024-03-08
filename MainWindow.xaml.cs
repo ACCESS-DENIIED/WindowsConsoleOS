@@ -1189,24 +1189,50 @@ namespace WindowSelector
 
         #endregion
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPLACEMENT
+        {
+            public int length;
+            public int flags;
+            public int showCmd;
+            public POINT ptMinPosition;
+            public POINT ptMaxPosition;
+            public RECT rcNormalPosition;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        const int SW_SHOWMINIMIZED = 2;
         const int SW_RESTORE = 9;
+        const int SW_MAXIMIZE = 3;
 
         // Function to switch to a specific window
-        private void WindowListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private async void WindowListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (aButtonPressed)
             {
                 if (WindowListBox.SelectedIndex >= 0 && WindowListBox.SelectedIndex < WindowListBox.Items.Count)
                 {
                     var selectedItem = WindowListBox.SelectedItem as dynamic;
-                    var process = selectedItem.Process as Process;
+                    var process = selectedItem?.Process as Process;
                     if (process != null && process.MainWindowHandle != IntPtr.Zero)
                     {
-                        // Request permission for the specific process
-                        AllowSetForegroundWindow(process.Id);
-                        // Restore the window if it's minimized
-                        ShowWindow(process.MainWindowHandle, SW_RESTORE);
-                        // Bring the window to the foreground
+                        WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                        GetWindowPlacement(process.MainWindowHandle, ref placement);
+
+                        if (placement.showCmd == SW_SHOWMINIMIZED)
+                        {
+                            ShowWindow(process.MainWindowHandle, SW_RESTORE);
+                            // Optional: Add a slight delay here if needed
+                            await Task.Delay(100); // 100 milliseconds delay
+                        }
+
+                        ShowWindow(process.MainWindowHandle, SW_MAXIMIZE);
                         SetForegroundWindow(process.MainWindowHandle);
                     }
                 }
@@ -1215,6 +1241,10 @@ namespace WindowSelector
         }
 
         #region Native Methods
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
