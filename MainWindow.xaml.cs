@@ -39,6 +39,7 @@ using System.Windows.Media.Effects;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using System.Windows.Interop;
+using System.Reflection;
 
 namespace WindowSelector
 {
@@ -47,6 +48,139 @@ namespace WindowSelector
         public string Name { get; set; }
         public Process Process { get; set; }
         public IntPtr WindowHandle { get; set; }
+    }
+
+    public class WindowSinker
+    {
+        #region Properties
+
+        const UInt32 SWP_NOSIZE = 0x0001;
+        const UInt32 SWP_NOMOVE = 0x0002;
+        const UInt32 SWP_NOACTIVATE = 0x0010;
+        const UInt32 SWP_NOZORDER = 0x0004;
+        const int WM_ACTIVATEAPP = 0x001C;
+        const int WM_ACTIVATE = 0x0006;
+        const int WM_SETFOCUS = 0x0007;
+        const int WM_WINDOWPOSCHANGING = 0x0046;
+
+        static readonly IntPtr HWND_TOPMOST = new IntPtr(1);
+
+        Window Window = null;
+
+        #endregion
+
+        #region WindowSinker
+
+        public WindowSinker(Window Window)
+        {
+            this.Window = Window;
+        }
+
+        #endregion
+
+        #region Methods
+
+        [DllImport("user32.dll")]
+        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr DeferWindowPos(IntPtr hWinPosInfo, IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr BeginDeferWindowPos(int nNumWindows);
+
+        [DllImport("user32.dll")]
+        static extern bool EndDeferWindowPos(IntPtr hWinPosInfo);
+
+        void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var Handle = (new WindowInteropHelper(Window)).Handle;
+
+            var Source = HwndSource.FromHwnd(Handle);
+            Source.RemoveHook(new HwndSourceHook(WndProc));
+        }
+
+        void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var Hwnd = new WindowInteropHelper(Window).Handle;
+            SetWindowPos(Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+
+            var Handle = (new WindowInteropHelper(Window)).Handle;
+
+            var Source = HwndSource.FromHwnd(Handle);
+            Source.AddHook(new HwndSourceHook(WndProc));
+        }
+
+        IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == WM_SETFOCUS)
+            {
+                hWnd = new WindowInteropHelper(Window).Handle;
+                SetWindowPos(hWnd, (IntPtr)(-1), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+                handled = true;
+            }
+            return IntPtr.Zero;
+        }
+
+        public void Sink()
+        {
+            Window.Loaded += OnLoaded;
+            Window.Closing += OnClosing;
+        }
+
+        public void Unsink()
+        {
+            Window.Loaded -= OnLoaded;
+            Window.Closing -= OnClosing;
+        }
+
+        #endregion
+    }
+
+    public static class WindowExtensions
+    {
+        #region Always On Bottom
+
+        public static readonly DependencyProperty SinkerProperty = DependencyProperty.RegisterAttached("Sinker", typeof(WindowSinker), typeof(WindowExtensions), new UIPropertyMetadata(null));
+        public static WindowSinker GetSinker(DependencyObject obj)
+        {
+            return (WindowSinker)obj.GetValue(SinkerProperty);
+        }
+        public static void SetSinker(DependencyObject obj, WindowSinker value)
+        {
+            obj.SetValue(SinkerProperty, value);
+        }
+
+        public static readonly DependencyProperty AlwaysOnBottomProperty = DependencyProperty.RegisterAttached("AlwaysOnBottom", typeof(bool), typeof(WindowExtensions), new UIPropertyMetadata(false, OnAlwaysOnBottomChanged));
+        public static bool GetAlwaysOnBottom(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(AlwaysOnBottomProperty);
+        }
+        public static void SetAlwaysOnBottom(DependencyObject obj, bool value)
+        {
+            obj.SetValue(AlwaysOnBottomProperty, value);
+        }
+        static void OnAlwaysOnBottomChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var Window = sender as Window;
+            if (Window != null)
+            {
+                if ((bool)e.NewValue)
+                {
+                    var Sinker = new WindowSinker(Window);
+                    Sinker.Sink();
+                    SetSinker(Window, Sinker);
+                }
+                else
+                {
+                    var Sinker = GetSinker(Window);
+                    Sinker.Unsink();
+                    SetSinker(Window, null);
+                }
+            }
+        }
+
+        #endregion
     }
 
     public class LazyImageLoader : IValueConverter
@@ -176,8 +310,12 @@ namespace WindowSelector
         private Gamepad previousGamepadState;
         private bool aButtonPressed = false;
 
+        private WindowSinker sinker;
+
         public MainWindow()
         {
+            sinker = new WindowSinker(this);
+            sinker.Sink();
             InitializeComponent();
             InitializeMaterialDesign();
             InitializeGamepadPolling();
@@ -229,6 +367,20 @@ namespace WindowSelector
         }
 
         private DispatcherTimer refreshTimer;
+
+        // Define the constants
+        const UInt32 SWP_NOSIZE = 0x0001;
+        const UInt32 SWP_NOMOVE = 0x0002;
+
+        // Declare the external method
+        [DllImport("user32.dll")]
+        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var Hwnd = new WindowInteropHelper(this).Handle; // Use 'this' to refer to the current window instance
+            SetWindowPos(Hwnd, (IntPtr)(-1), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        }
 
         private void BringApplicationToFront()
         {
@@ -289,7 +441,7 @@ namespace WindowSelector
             IntPtr foregroundWindow = GetForegroundWindow();
             GetWindowThreadProcessId(foregroundWindow, out int foregroundProcId);
             Process foregroundProc = Process.GetProcessById(foregroundProcId);
-            if (foregroundProc.ProcessName != Process.GetCurrentProcess().ProcessName)
+            if (this.WindowState == WindowState.Minimized || !this.IsVisible)
             {
                 // Restore window from tray if L1, R1, and DPad Left are pressed
                 if (l1Pressed && r1Pressed && dpadLeftPressed)
@@ -299,6 +451,7 @@ namespace WindowSelector
                         RestoreWindowFromTray();
                     });
                 }
+                // Ignore further gamepad inputs since the window is minimized or not visible
                 return;
             }
 
@@ -353,6 +506,7 @@ namespace WindowSelector
                         {
                             ChangeAudioDeviceToSelected(selectedDevice);
                             HideAudioDevicesPopup();
+                            aButtonPressed = false;
                         }
                     }
 
@@ -367,7 +521,7 @@ namespace WindowSelector
             }
             else
             {
-                // If the fullscreen menu is not visible and the 'B' button is pressed, hide the main window to the tray.
+                // If the audio menu is not visible and the 'B' button is pressed, hide the main window to the tray.
                 if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
                 {
                     Dispatcher.Invoke(() =>
@@ -385,6 +539,7 @@ namespace WindowSelector
                     this.Hide();
                     trayIcon.Visible = true;
                     HideAudioDevicesPopup();
+                    aButtonPressed = false;
                 }
 
                 if (yPressed && !previousButtons.HasFlag(GamepadButtonFlags.Y))
@@ -397,6 +552,10 @@ namespace WindowSelector
                         if (process != null && process.MainWindowHandle != IntPtr.Zero)
                         {
                             ShowWindow(process.MainWindowHandle, SW_MINIMIZE);
+                            this.Activate();
+                            this.Focus();
+                            SetForegroundWindow(new WindowInteropHelper(this).Handle);
+
                         }
                     }
                 }
@@ -904,7 +1063,6 @@ namespace WindowSelector
 
         private void RestoreWindowFromTray()
         {
-
             ShowTrayIcon(false);
             this.Show();
             this.WindowState = WindowState.Maximized;
@@ -913,10 +1071,6 @@ namespace WindowSelector
             this.Activate();
             this.Focus();
             this.Topmost = true; // Make the window topmost
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                this.Topmost = false; // Revert after a short delay
-            }), DispatcherPriority.ApplicationIdle);
 
             // Set dimensions
             this.Left = 0;
@@ -927,10 +1081,16 @@ namespace WindowSelector
             // Hide the popup, if it's open
             HideAudioDevicesPopup();
 
-            // SetForegroundWindow call
-            IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            // Allow the window to set itself as the foreground window
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
             AllowSetForegroundWindow(ASFW_ANY);
             SetForegroundWindow(hwnd);
+
+            // Optionally revert the topmost status after a short delay
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                this.Topmost = false;
+            }), DispatcherPriority.ApplicationIdle);
         }
 
         private string GetFriendlyName(string processName)
@@ -998,6 +1158,8 @@ namespace WindowSelector
 
         #endregion
 
+        const int SW_RESTORE = 9;
+
         // Function to switch to a specific window
         private void WindowListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
@@ -1009,7 +1171,12 @@ namespace WindowSelector
                     var process = selectedItem.Process as Process;
                     if (process != null && process.MainWindowHandle != IntPtr.Zero)
                     {
-                        SwitchToThisWindow(process.MainWindowHandle, true);
+                        // Request permission for the specific process
+                        AllowSetForegroundWindow(process.Id);
+                        // Restore the window if it's minimized
+                        ShowWindow(process.MainWindowHandle, SW_RESTORE);
+                        // Bring the window to the foreground
+                        SetForegroundWindow(process.MainWindowHandle);
                     }
                 }
                 aButtonPressed = false;
