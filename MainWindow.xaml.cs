@@ -455,7 +455,25 @@ namespace WindowSelector
                 return;
             }
 
-            if (AudioDevicesPopup.IsOpen)
+            // Check if the application is minimized
+            if (this.WindowState == WindowState.Minimized)
+            {
+                // Restore window from tray if L1, R1, and DPad Left are pressed
+                if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) &&
+                    gamepadState.Buttons.HasFlag(GamepadButtonFlags.RightShoulder) &&
+                    gamepadState.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        RestoreWindowFromTray();
+                    });
+                }
+                else
+                {
+                    return; // Ignore other inputs if the application is minimized
+                }
+            }
+            else if (AudioDevicesPopup.IsOpen)
             {
                 // Prevent double dpad input when activating the popup
                 if ((DateTime.Now - lastMenuOpenTime).TotalMilliseconds < 150)
@@ -646,6 +664,19 @@ namespace WindowSelector
                         trayIcon.Visible = true;
                         HideAudioDevicesPopup();
                     }
+                }
+            }
+
+            if (gamepadState.Buttons.HasFlag(GamepadButtonFlags.B) && !previousGamepadState.Buttons.HasFlag(GamepadButtonFlags.B))
+            { // if the tray icon is not visible and the 'B' button is pressed, hide the main window to the tray
+                if (!trayIcon.Visible)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        this.Hide(); // Hide the main window
+                        trayIcon.Visible = true; // Make sure the tray icon is visible
+                        HideAudioDevicesPopup();
+                    });
                 }
             }
             previousGamepadState = gamepadState;
