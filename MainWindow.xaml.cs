@@ -50,6 +50,20 @@ namespace WindowSelector
         public IntPtr WindowHandle { get; set; }
     }
 
+    public partial class App : Application
+    {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            // Check if there are any other instances running
+            if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Length > 1)
+            {
+                MessageBox.Show("An instance of the application is already running.");
+                Application.Current.Shutdown(); // Close the current instance
+            }
+        }
+    }
+
     public class WindowSinker
     {
         #region Properties
@@ -402,7 +416,6 @@ namespace WindowSelector
 
         private void Current_Exit(object sender, ExitEventArgs e)
         {
-            // Clean up the tray icon when the application exits
             if (trayIcon != null)
             {
                 trayIcon.Visible = false;
@@ -523,7 +536,6 @@ namespace WindowSelector
                         if (selectedDevice != null)
                         {
                             ChangeAudioDeviceToSelected(selectedDevice);
-                            HideAudioDevicesPopup();
                             aButtonPressed = false;
                         }
                     }
@@ -909,11 +921,48 @@ namespace WindowSelector
             {
                 try
                 {
+                    // Start loading animation immediately
+                    Dispatcher.Invoke(() =>
+                    {
+                        var loadingAnimation = (Storyboard)FindResource("LoadingTextColorAnimation");
+                        LoadingText.Visibility = Visibility.Visible; // Ensure the loading text is visible
+                        loadingAnimation.Begin(); // Start the loading text animation
+                    });
+
+                    await Task.Delay(100); // Small delay for UI to update
+
+                    // Attempt to set the selected audio device as the default
                     await SetDefaultAudioDeviceAsync(selectedDevice.Id);
+
+                    // After operation, proceed to show completion and start completion animation
+                    _ = Dispatcher.Invoke(async () =>
+                    {
+                        // Stop any ongoing loading animation if needed
+                        var loadingAnimation = (Storyboard)FindResource("LoadingTextColorAnimation");
+                        loadingAnimation.Stop();
+
+                        // Start completion animation
+                        var completionAnimation = (Storyboard)FindResource("CompletionBackgroundAnimation");
+                        LoadingText.Visibility = Visibility.Collapsed; // Hide loading text
+                        CompletedText.Visibility = Visibility.Visible; // Show completed text
+                        completionAnimation.Begin(); // Begin the completion animation
+
+                        await Task.Delay(1000); // Allow some time for the user to see the completion message
+
+                        // Optionally hide the completion text or reset UI for the next operation
+                        CompletedText.Visibility = Visibility.Collapsed;
+                        HideAudioDevicesPopup(); // Hide the audio devices popup
+                    });
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error setting default audio device: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Dispatcher.Invoke(() =>
+                    {
+                        // Ensure all related UI elements are reset in case of an error
+                        LoadingText.Visibility = Visibility.Collapsed;
+                        CompletedText.Visibility = Visibility.Collapsed;
+                    });
                 }
             }
         }
@@ -1088,6 +1137,8 @@ namespace WindowSelector
             {
                 trayIcon.Dispose();
             }
+            //e.Cancel = true; // Prevents the window from closing
+            this.Hide();
             base.OnClosing(e);
             HideAudioDevicesPopup();
         }

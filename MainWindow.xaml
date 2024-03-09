@@ -11,7 +11,7 @@
                 Background="Transparent"
                 TextElement.FontWeight="Medium"
                 TextElement.FontSize="14"
-                FontFamily="{DynamicResource MaterialDesignFont}"
+                FontFamily="./#Inter-Black"
                 Topmost="True"
                 WindowStyle="None"
                 WindowState="Maximized">
@@ -26,6 +26,7 @@
                               First="{StaticResource SimplifyDeviceNameConverter}" 
                               Second="{StaticResource StringToUpperConverter}"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <SolidColorBrush x:Key="InitialBackground" Color="Transparent"/>
         <SolidColorBrush x:Key="PrimaryColor" Color="#FF6200EE"/>
         <SolidColorBrush x:Key="SecondaryColor" Color="#FF03DAC6"/>
         <SolidColorBrush x:Key="BackgroundColor" Color="#FF121212"/>
@@ -52,6 +53,19 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
                 <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="100"/>
             </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="LoadingTextColorAnimation">
+            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" Storyboard.TargetName="LoadingText"
+                                      RepeatBehavior="Forever">
+                <LinearColorKeyFrame Value="Gray" KeyTime="0:0:0.5"/>
+                <LinearColorKeyFrame Value="White" KeyTime="0:0:1"/>
+            </ColorAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="CompletionBackgroundAnimation">
+            <ColorAnimation Duration="0:0:0.5" To="Green" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" Storyboard.TargetName="CompletedTextBackground"/>
+        </Storyboard>
+        <Storyboard x:Key="OperationInProgressAnimation">
+            <ColorAnimation Duration="0:0:1" To="LightBlue" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" Storyboard.TargetName="LoadingTextBackground" AutoReverse="True" RepeatBehavior="Forever"/>
         </Storyboard>
     </Window.Resources>
 
@@ -145,10 +159,10 @@
             </Grid>
 
             <!-- Popup for Audio Devices -->
-            <Popup x:Name="AudioDevicesPopup" 
-                       Placement="Center" 
-                       AllowsTransparency="True" 
-                       IsOpen="False">
+            <Popup x:Name="AudioDevicesPopup"
+                   Placement="Center" 
+                   AllowsTransparency="True" 
+                   IsOpen="False">
                 <Grid>
                     <Border Margin="25" CornerRadius="20">
                     </Border>
@@ -321,6 +335,27 @@
                                         </TabControl>
                                     </StackPanel>
                                 </Border>
+                                <!-- Loading Text Background -->
+                                <Grid Margin="10">
+                                    <Border x:Name="LoadingTextBackground" Background="{StaticResource InitialBackground}" CornerRadius="5">
+                                        <TextBlock x:Name="LoadingText" 
+                                                   Text="Redirecting Audio Streams..." 
+                                                   Visibility="Collapsed" 
+                                                   Foreground="White" 
+                                                   FontSize="24" 
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <Border x:Name="CompletedTextBackground" Background="{StaticResource InitialBackground}" CornerRadius="5">
+                                        <TextBlock x:Name="CompletedText" 
+                                                   Text="Audio Redirection Complete" 
+                                                   Visibility="Collapsed" 
+                                                   Foreground="White"
+                                                   FontSize="24" 
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                </Grid>
                             </StackPanel>
                         </StackPanel>
                     </Border>
