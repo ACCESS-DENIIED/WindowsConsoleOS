@@ -8,10 +8,11 @@
                 ShowInTaskbar="False"
                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:ui="http://schemas.modernwpf.com/2019"
                 TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-                Background="{DynamicResource MaterialDesignPaper}"
+                Background="Transparent"
                 TextElement.FontWeight="Medium"
                 TextElement.FontSize="14"
                 FontFamily="{DynamicResource MaterialDesignFont}"
+                Topmost="True"
                 WindowStyle="None"
                 WindowState="Maximized">
 
