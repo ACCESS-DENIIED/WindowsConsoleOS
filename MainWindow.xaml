@@ -34,10 +34,11 @@
         <SolidColorBrush x:Key="SurfaceColor" Color="#FF333333"/>
         <SolidColorBrush x:Key="OnSurfaceColor" Color="#DEFFFFFF"/>
         <local:LazyImageLoader x:Key="LazyImageLoader"/>
+        <!-- Audio Device Popup Menu Animations -->
         <Storyboard x:Key="OpenAudioDevicePopupAnimation">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)">
                 <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1"/>
             </DoubleAnimationUsingKeyFrames>
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
                 <EasingDoubleKeyFrame KeyTime="0:0:0" Value="100"/>
@@ -47,25 +48,20 @@
         <Storyboard x:Key="CloseAudioDevicePopupAnimation">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)">
                 <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
-                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="0"/>
             </DoubleAnimationUsingKeyFrames>
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
                 <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
                 <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="100"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
-        <Storyboard x:Key="LoadingTextColorAnimation">
-            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" Storyboard.TargetName="LoadingText"
-                                      RepeatBehavior="Forever">
-                <LinearColorKeyFrame Value="Gray" KeyTime="0:0:0.5"/>
-                <LinearColorKeyFrame Value="White" KeyTime="0:0:1"/>
-            </ColorAnimationUsingKeyFrames>
+        <!-- Audio Device Selected Loading Animations -->
+        <Storyboard x:Key="LoadingTextBackgroundAnimation" RepeatBehavior="Forever">
+            
         </Storyboard>
+        <!-- Completion Animation -->
         <Storyboard x:Key="CompletionBackgroundAnimation">
-            <ColorAnimation Duration="0:0:0.5" To="Green" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" Storyboard.TargetName="CompletedTextBackground"/>
-        </Storyboard>
-        <Storyboard x:Key="OperationInProgressAnimation">
-            <ColorAnimation Duration="0:0:1" To="LightBlue" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" Storyboard.TargetName="LoadingTextBackground" AutoReverse="True" RepeatBehavior="Forever"/>
+            
         </Storyboard>
     </Window.Resources>
 

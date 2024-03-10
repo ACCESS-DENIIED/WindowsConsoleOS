@@ -40,6 +40,8 @@ using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using System.Windows.Interop;
 using System.Reflection;
+using Border = System.Windows.Controls.Border;
+using Color = System.Windows.Media.Color;
 
 namespace WindowSelector
 {
@@ -835,19 +837,19 @@ namespace WindowSelector
         {
             try
             {
-                // Create a new instance of CoreAudioController
                 var controller = new AudioSwitcher.AudioApi.CoreAudio.CoreAudioController();
-                // Get the device by its Id
-                var device = await controller.GetDeviceAsync(deviceId);
+                var device = await controller.GetDeviceAsync(deviceId).ConfigureAwait(false);
                 if (device != null)
                 {
-                    // Set the device as the default playback device
-                    await device.SetAsDefaultAsync();
+                    await device.SetAsDefaultAsync().ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error setting default audio device: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Since this runs in a background thread, use Dispatcher.Invoke to show the message box
+                Dispatcher.Invoke(() =>
+                    MessageBox.Show($"Error setting default audio device: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error)
+                );
             }
         }
 
@@ -917,54 +919,106 @@ namespace WindowSelector
 
         private async void ChangeAudioDeviceToSelected(AudioDevice selectedDevice)
         {
-            if (selectedDevice != null)
+            if (selectedDevice == null) return;
+
+            try
             {
-                try
+                // Reset UI to initial state explicitly
+                Dispatcher.Invoke(() =>
                 {
-                    // Start loading animation immediately
-                    Dispatcher.Invoke(() =>
-                    {
-                        var loadingAnimation = (Storyboard)FindResource("LoadingTextColorAnimation");
-                        LoadingText.Visibility = Visibility.Visible; // Ensure the loading text is visible
-                        loadingAnimation.Begin(); // Start the loading text animation
-                    });
+                    // Ensure LoadingText is visible and CompletedText is fully hidden
+                    LoadingText.Visibility = Visibility.Visible;
+                    CompletedText.Visibility = Visibility.Collapsed; // Hide CompletedText initially
+                    CompletedText.Opacity = 0; // Ensure it's fully transparent
 
-                    await Task.Delay(100); // Small delay for UI to update
+                    // Reset backgrounds to transparent
+                    LoadingTextBackground.Background = new SolidColorBrush(Colors.Transparent);
+                    CompletedTextBackground.Background = new SolidColorBrush(Colors.Transparent);
+                });
 
-                    // Attempt to set the selected audio device as the default
-                    await SetDefaultAudioDeviceAsync(selectedDevice.Id);
+                // Simulate the operation
+                await Task.Run(() => SetDefaultAudioDeviceAsync(selectedDevice.Id));
 
-                    // After operation, proceed to show completion and start completion animation
-                    _ = Dispatcher.Invoke(async () =>
-                    {
-                        // Stop any ongoing loading animation if needed
-                        var loadingAnimation = (Storyboard)FindResource("LoadingTextColorAnimation");
-                        loadingAnimation.Stop();
-
-                        // Start completion animation
-                        var completionAnimation = (Storyboard)FindResource("CompletionBackgroundAnimation");
-                        LoadingText.Visibility = Visibility.Collapsed; // Hide loading text
-                        CompletedText.Visibility = Visibility.Visible; // Show completed text
-                        completionAnimation.Begin(); // Begin the completion animation
-
-                        await Task.Delay(1000); // Allow some time for the user to see the completion message
-
-                        // Optionally hide the completion text or reset UI for the next operation
-                        CompletedText.Visibility = Visibility.Collapsed;
-                        HideAudioDevicesPopup(); // Hide the audio devices popup
-                    });
-                }
-                catch (Exception ex)
+                // Ensure LoadingText is hidden before showing CompletedText
+                Dispatcher.Invoke(() =>
                 {
-                    MessageBox.Show($"Error setting default audio device: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Dispatcher.Invoke(() =>
-                    {
-                        // Ensure all related UI elements are reset in case of an error
-                        LoadingText.Visibility = Visibility.Collapsed;
-                        CompletedText.Visibility = Visibility.Collapsed;
-                    });
-                }
+                    LoadingText.Visibility = Visibility.Collapsed;
+                });
+
+                // Prepare CompletedText for showing
+                Dispatcher.Invoke(() =>
+                {
+                    CompletedTextBackground.Background = new SolidColorBrush(Colors.Green); // Set background to green for visibility
+                    CompletedText.Visibility = Visibility.Visible; // Make CompletedText visible but still transparent
+                });
+
+                // Fade in CompletedText
+                var fadeInAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = new Duration(TimeSpan.FromSeconds(1))
+                };
+                Dispatcher.Invoke(() =>
+                {
+                    CompletedText.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
+                });
+
+                // Wait for the fade-in animation to complete plus a moment to ensure user sees the completed state
+                await Task.Delay(TimeSpan.FromSeconds(3));
+
+                // Reset UI for next use
+                Dispatcher.Invoke(() =>
+                {
+                    // Hide and reset CompletedText for next operation
+                    CompletedText.Visibility = Visibility.Collapsed;
+                    CompletedText.Opacity = 0; // Reset opacity to fully transparent
+
+                    // Reset background colors to transparent
+                    LoadingTextBackground.Background = new SolidColorBrush(Colors.Transparent);
+                    CompletedTextBackground.Background = new SolidColorBrush(Colors.Transparent);
+                });
             }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() =>
+                    MessageBox.Show($"Error setting default audio device: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error));
+            }
+        }
+
+        private async Task AnimateBackgroundColor(Border target, Color fromColor, Color toColor, TimeSpan duration)
+        {
+            var animation = new ColorAnimation
+            {
+                From = fromColor,
+                To = toColor,
+                Duration = duration
+            };
+
+            Dispatcher.Invoke(() =>
+            {
+                var brush = new SolidColorBrush(fromColor);
+                target.Background = brush;
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+            });
+
+            await Task.Delay(duration);
+        }
+
+        private async Task FadeOutUIElement(UIElement element, TimeSpan duration)
+        {
+            var fadeOutAnimation = new DoubleAnimation
+            {
+                From = 1.0, // Start fully opaque
+                To = 0.0, // End completely transparent
+                Duration = duration
+            };
+
+            Storyboard storyboard = new Storyboard();
+            storyboard.Children.Add(fadeOutAnimation);
+            Storyboard.SetTarget(fadeOutAnimation, element);
+            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath("Opacity"));
+            storyboard.Begin();
         }
 
         //
