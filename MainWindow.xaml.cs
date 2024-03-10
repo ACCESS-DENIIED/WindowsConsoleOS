@@ -52,20 +52,6 @@ namespace WindowSelector
         public IntPtr WindowHandle { get; set; }
     }
 
-    public partial class App : Application
-    {
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
-            // Check if there are any other instances running
-            if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Length > 1)
-            {
-                MessageBox.Show("An instance of the application is already running.");
-                Application.Current.Shutdown(); // Close the current instance
-            }
-        }
-    }
-
     public class WindowSinker
     {
         #region Properties
@@ -947,23 +933,23 @@ namespace WindowSelector
                     CompletedText.Opacity = 1;
                 });
 
-                // Instead of a fixed delay, immediately proceed to fade out after ensuring CompletedText is visible
+                // Immediately fade out after ensuring CompletedText is visible
                 var fadeOutAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
-                    Duration = new Duration(TimeSpan.FromSeconds(1))
+                    Duration = new Duration(TimeSpan.FromSeconds(2))
                 };
 
                 // Apply fade-out animation to both CompletedText and its background
                 Dispatcher.Invoke(() =>
                 {
-                    CompletedText.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
                     CompletedTextBackground.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
+                    CompletedText.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
                 });
 
                 // Wait for the fade-out to complete before resetting UI
-                await Task.Delay(TimeSpan.FromSeconds(1)); // This delay ensures the fade-out animation completes
+                await Task.Delay(TimeSpan.FromSeconds(2)); // This delay ensures the fade-out animation completes
                 Dispatcher.Invoke(() =>
                 {
                     // Hide and reset CompletedText for next operation
