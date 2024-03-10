@@ -926,11 +926,8 @@ namespace WindowSelector
                 // Reset UI to initial state explicitly
                 Dispatcher.Invoke(() =>
                 {
-                    // Ensure LoadingText is visible and CompletedText is fully hidden
+                    // Ensure LoadingText is visible
                     LoadingText.Visibility = Visibility.Visible;
-                    CompletedText.Visibility = Visibility.Collapsed; // Hide CompletedText initially
-                    CompletedText.Opacity = 0; // Ensure it's fully transparent
-
                     // Reset backgrounds to transparent
                     LoadingTextBackground.Background = new SolidColorBrush(Colors.Transparent);
                     CompletedTextBackground.Background = new SolidColorBrush(Colors.Transparent);
@@ -939,44 +936,42 @@ namespace WindowSelector
                 // Simulate the operation
                 await Task.Run(() => SetDefaultAudioDeviceAsync(selectedDevice.Id));
 
-                // Ensure LoadingText is hidden before showing CompletedText
+                // Immediately after operation, prepare for showing CompletedText
                 Dispatcher.Invoke(() =>
                 {
+                    // Hide LoadingText
                     LoadingText.Visibility = Visibility.Collapsed;
+                    // Set background to green for visibility and make CompletedText visible and fully opaque
+                    CompletedTextBackground.Background = new SolidColorBrush(Colors.Green);
+                    CompletedText.Visibility = Visibility.Visible;
+                    CompletedText.Opacity = 1;
                 });
 
-                // Prepare CompletedText for showing
-                Dispatcher.Invoke(() =>
+                // Instead of a fixed delay, immediately proceed to fade out after ensuring CompletedText is visible
+                var fadeOutAnimation = new DoubleAnimation
                 {
-                    CompletedTextBackground.Background = new SolidColorBrush(Colors.Green); // Set background to green for visibility
-                    CompletedText.Visibility = Visibility.Visible; // Make CompletedText visible but still transparent
-                });
-
-                // Fade in CompletedText
-                var fadeInAnimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
+                    From = 1,
+                    To = 0,
                     Duration = new Duration(TimeSpan.FromSeconds(1))
                 };
+
+                // Apply fade-out animation to both CompletedText and its background
                 Dispatcher.Invoke(() =>
                 {
-                    CompletedText.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
+                    CompletedText.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
+                    CompletedTextBackground.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
                 });
 
-                // Wait for the fade-in animation to complete plus a moment to ensure user sees the completed state
-                await Task.Delay(TimeSpan.FromSeconds(3));
-
-                // Reset UI for next use
+                // Wait for the fade-out to complete before resetting UI
+                await Task.Delay(TimeSpan.FromSeconds(1)); // This delay ensures the fade-out animation completes
                 Dispatcher.Invoke(() =>
                 {
                     // Hide and reset CompletedText for next operation
                     CompletedText.Visibility = Visibility.Collapsed;
-                    CompletedText.Opacity = 0; // Reset opacity to fully transparent
-
-                    // Reset background colors to transparent
-                    LoadingTextBackground.Background = new SolidColorBrush(Colors.Transparent);
+                    CompletedText.Opacity = 0; // Ensure it's ready for next use
+                                               // Reset background colors to transparent
                     CompletedTextBackground.Background = new SolidColorBrush(Colors.Transparent);
+                    CompletedTextBackground.Opacity = 1; // Reset opacity to fully opaque for next use
                 });
             }
             catch (Exception ex)
