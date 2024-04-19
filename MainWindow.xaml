@@ -57,11 +57,11 @@
         </Storyboard>
         <!-- Audio Device Selected Loading Animations -->
         <Storyboard x:Key="LoadingTextBackgroundAnimation" RepeatBehavior="Forever">
-            
+
         </Storyboard>
         <!-- Completion Animation -->
         <Storyboard x:Key="CompletionBackgroundAnimation">
-            
+
         </Storyboard>
     </Window.Resources>
 

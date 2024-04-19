@@ -79,6 +79,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Taskbar\Taskbar.xaml.cs">
+      <DependentUpon>Taskbar.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -91,6 +94,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Taskbar\Taskbar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -176,6 +183,9 @@
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>4.9.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ML.FastTree">
+      <Version>3.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.PowerShell.SDK">
       <Version>7.4.1</Version>
